@@ -1,0 +1,15 @@
+# Repo-globaler Laufzeit-State (DESIGN §3.2) — eine geteilte Kopie, nicht versioniert
+.claude/.state.md
+
+# Runtime-State: SQLite, Worktrees, Job-Logs (Verzeichnis bleibt via .gitkeep sichtbar)
+data/*
+!data/.gitkeep
+
+# Hinweis: ~/.config/bibi/env liegt AUSSERHALB des Repos (von `bibi-ctrl init`
+# erzeugt) und wird hier nur dokumentiert — siehe INSTALL.md.
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
