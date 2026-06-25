@@ -1,0 +1,35 @@
+default_dirs:
+  skills:
+    - default: .claude/skills/
+    - global: ~/.claude/skills/
+  agents:
+    - default: .claude/agents/
+  prompts:
+    - default: .claude/commands/
+
+library:
+  skills:
+    - name: open
+      description: Case öffnen oder reaktivieren
+      source: https://github.com/plan-net-journey/bibi/tree/master/skills/open
+    - name: save
+      description: Status committen und pushen
+      source: https://github.com/plan-net-journey/bibi/tree/master/skills/save
+      requires: [skill:sync]
+    - name: close
+      description: Case pausieren
+      source: https://github.com/plan-net-journey/bibi/tree/master/skills/close
+      requires: [skill:save]
+    - name: done
+      description: Case abschliessen
+      source: https://github.com/plan-net-journey/bibi/tree/master/skills/done
+      requires: [skill:save]
+    - name: delete
+      description: Case unwiderruflich löschen
+      source: https://github.com/plan-net-journey/bibi/tree/master/skills/delete
+    - name: protocol
+      description: Per-Turn-Logging ein-/ausschalten
+      source: https://github.com/plan-net-journey/bibi/tree/master/skills/protocol
+    - name: sync
+      description: Repo manuell oder automatisch synchronisieren
+      source: https://github.com/plan-net-journey/bibi/tree/master/skills/sync

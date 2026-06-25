@@ -6,8 +6,9 @@ Repo — nur der Ablauf (DESIGN §4.10).
 ## Voraussetzungen
 
 - [`uv`](https://docs.astral.sh/uv/) installiert
+- [`gh`](https://cli.github.com/) installiert und eingeloggt (`gh auth login`)
 - Git-Zugang zum Team-Repo und zur `bibi`-Engine (beide privat auf GitHub-Org
-  `plan-net-journey`; Auth z. B. via `gh auth login` oder Credential-Helper)
+  `plan-net-journey`)
 
 ## Schritte
 
@@ -41,7 +42,28 @@ Repo — nur der Ablauf (DESIGN §4.10).
    | `BIBI_ROLE` | `worker,synchronizer` | kombinierte Rollen dieses Knotens |
    | `BIBI_REMOTE` | `https://github.com/plan-net-journey/bibi-team.git` | Git-Remote für den Synchronizer |
 
-4. **(Optional) Daemon-Rollen installieren**
+4. **Skills installieren (the-library)**
+
+   the-library ist ein externer Skill-Katalog, der `/library sync` bereitstellt.
+   Er wird **einmalig pro Maschine** global installiert:
+
+   ```bash
+   git clone https://github.com/disler/the-library.git ~/.claude/skills/library
+   ```
+
+   Danach im Team-Repo die deklarierten Skills aus `library.yaml` ziehen:
+
+   ```bash
+   /library sync
+   ```
+
+   Die Skills landen in `.claude/skills/` (lokal, gitignored) und sind danach
+   in Claude Code als `/open`, `/save`, `/close` usw. verfügbar.
+
+   > Nach Engine-Updates (`git pull` im bibi-Repo) nochmals `/library sync`
+   > ausführen, damit die Skill-Dateien aktualisiert werden.
+
+5. **(Optional) Daemon-Rollen installieren**
 
    ```bash
    bibi-ctrl daemon install
