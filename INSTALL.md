@@ -1,36 +1,42 @@
 # Setup — bibi-team
 
-Menschenlesbare Setup-Checkliste für einen neuen Knoten. Keine Credentials im
-Repo — nur der Ablauf (DESIGN §4.10).
+Menschenlesbare Setup-Checkliste. Keine Credentials im Repo (DESIGN §4.10).
 
-## Voraussetzungen
+---
+
+## Für Entwickler (Standard-Setup)
+
+Skills sind committed — nach dem Clone sofort verfügbar, kein the-library nötig.
+
+### Voraussetzungen
 
 - [`uv`](https://docs.astral.sh/uv/) installiert
 - [`gh`](https://cli.github.com/) installiert und eingeloggt (`gh auth login`)
-  — wird für private Repos (bibi-Engine + the-library-Skills) benötigt
-- Git-Zugang zum Team-Repo und zur `bibi`-Engine (beide privat auf GitHub-Org
-  `plan-net-journey`)
 
-## Schritte
+### Schritte
 
-### 1. Team-Repo klonen
+**1. Repo klonen**
 
 ```bash
 gh repo clone plan-net-journey/bibi-team
 cd bibi-team
 ```
 
-### 2. Engine installieren
+**2. Engine installieren**
 
 ```bash
 uv venv
-uv pip install .            # zieht bibi aus dem deklarierten git-Dependency
-# ODER für lokale Engine-Entwicklung:
-uv pip install -e ../bibi   # editierbar gegen den lokalen bibi-Klon
+uv pip install .
 source .venv/bin/activate
 ```
 
-### 3. Knoten bootstrappen
+Für lokale Engine-Entwicklung stattdessen:
+
+```bash
+uv pip install -e ../bibi   # editierbar gegen lokalen bibi-Klon
+```
+
+**3. Knoten bootstrappen**
 
 ```bash
 bibi-ctrl init
@@ -43,22 +49,61 @@ nie versioniert):
 |---|---|---|
 | `BIBI_SCHEDULER_URL` | `http://sarasate:8769` | wohin `--connect` zeigt |
 | `BIBI_ROLE` | `worker,synchronizer` | kombinierte Rollen dieses Knotens |
-| `BIBI_REMOTE` | `https://github.com/plan-net-journey/bibi-team.git` | Git-Remote für den Synchronizer |
+| `BIBI_REMOTE` | `https://github.com/plan-net-journey/bibi-team.git` | Git-Remote für Synchronizer |
 
-### 4. The-library einrichten und Skills installieren
+**4. Verify**
 
-The-library ist ein Meta-Skill für private Skill-Distribution. Er wird
-**einmalig pro Maschine** global eingerichtet und stellt `/library` in
-jeder Claude-Code-Session bereit.
+```bash
+bibi-ctrl status
+```
 
-#### 4a. The-library forken und klonen (einmalig)
+Starte Claude Code im Repo-Verzeichnis — `/open`, `/save` etc. erscheinen
+als Befehle (Skills sind in `.claude/skills/` committed).
+
+**5. (Optional) Daemon-Rollen installieren**
+
+```bash
+bibi-ctrl daemon install
+```
+
+Welche Rollen je Knotentyp sinnvoll sind, ergänzt das Team sobald die
+Laufzeit steht (spätere Phasen).
+
+---
+
+## Für den Skills-Maintainer
+
+Der Maintainer verwaltet das Plugin-System: er installiert neue Skills und
+führt Upgrades durch. Andere Entwickler erhalten Änderungen via `git pull`.
+
+### Modell: Vendoring + the-library
+
+```
+library.yaml          ← Manifest (wie package.json) — committed
+.claude/skills/       ← Vendored Skills (committed, nicht gitignored)
+the-library           ← Werkzeug für Install/Upgrade (nur für Maintainer)
+```
+
+The-library liest `library.yaml`, zieht Skill-Dateien aus dem Engine-Repo
+und legt sie in `.claude/skills/`. Der Maintainer prüft den Diff und committet.
+
+### The-library einrichten (einmalig)
+
+**1. Fork erstellen**
 
 ```bash
 gh repo fork disler/the-library --private --clone=false
+```
+
+**2. In globales Skills-Verzeichnis klonen**
+
+```bash
 gh repo clone <dein-github-name>/the-library ~/.claude/skills/library
 ```
 
-#### 4b. Fork-URL in SKILL.md eintragen (einmalig)
+`/library` ist damit in jeder Claude-Code-Session global verfügbar.
+
+**3. Fork-URL eintragen**
 
 In `~/.claude/skills/library/SKILL.md` den `## Variables`-Abschnitt anpassen:
 
@@ -66,39 +111,17 @@ In `~/.claude/skills/library/SKILL.md` den `## Variables`-Abschnitt anpassen:
 - **LIBRARY_REPO_URL**: `https://github.com/<dein-github-name>/the-library.git`
 ```
 
-Die anderen beiden Variablen (`LIBRARY_YAML_PATH`, `LIBRARY_SKILL_DIR`) bleiben
-unverändert, sofern du nach `~/.claude/skills/library/` geklont hast.
+`LIBRARY_YAML_PATH` und `LIBRARY_SKILL_DIR` bleiben unverändert.
 
-#### 4c. bibi-Skills in den persönlichen Katalog eintragen (einmalig)
+**4. Verify**
 
-Die benötigten Skills sind in `library.yaml` im Team-Repo als Referenzliste
-dokumentiert. Diese Einträge in den persönlichen Katalog übertragen:
+Neue Claude-Code-Session starten → `/library list` zeigt den leeren Katalog.
 
-```bash
-cat library.yaml   # Einträge ansehen
-```
+### Skills installieren oder upgraden
 
-Den `library:`-Block aus dieser Datei in
-`~/.claude/skills/library/library.yaml` einfügen — oder jeden Skill einzeln
-via Claude Code registrieren:
+**Initialer Install** (nach Einrichten von the-library):
 
 ```
-/library add open skill from https://github.com/plan-net-journey/bibi/blob/master/skills/open/SKILL.md
-/library add save skill from https://github.com/plan-net-journey/bibi/blob/master/skills/save/SKILL.md
-/library add close skill from https://github.com/plan-net-journey/bibi/blob/master/skills/close/SKILL.md
-/library add done skill from https://github.com/plan-net-journey/bibi/blob/master/skills/done/SKILL.md
-/library add delete skill from https://github.com/plan-net-journey/bibi/blob/master/skills/delete/SKILL.md
-/library add protocol skill from https://github.com/plan-net-journey/bibi/blob/master/skills/protocol/SKILL.md
-/library add sync skill from https://github.com/plan-net-journey/bibi/blob/master/skills/sync/SKILL.md
-```
-
-> Hinweis: `plan-net-journey/bibi` ist ein privates Repo. The-library nutzt
-> automatisch die `gh`-Credentials für den Zugriff.
-
-#### 4d. Skills im Team-Repo installieren (nach jedem Clone oder Engine-Update)
-
-```bash
-cd ~/Project/bibi-team   # im Team-Repo-Verzeichnis
 /library use open
 /library use save
 /library use close
@@ -108,26 +131,36 @@ cd ~/Project/bibi-team   # im Team-Repo-Verzeichnis
 /library use sync
 ```
 
-Die Skills landen in `.claude/skills/` (lokal, gitignored) und sind danach
-als `/open`, `/save`, `/close` usw. in Claude Code sichtbar.
+> `plan-net-journey/bibi` ist privat — the-library nutzt automatisch die
+> `gh`-Credentials.
 
-> Nach Engine-Updates (`git pull` im bibi-Repo): `/library sync` zieht alle
-> installierten Skills auf den neuesten Stand.
+**Upgrade** (nach Engine-Update):
 
-### 5. Verify
-
-```bash
-bibi-ctrl status          # zeigt path/auto_sync/config
+```
+/library sync
 ```
 
-Starte Claude Code im Team-Repo — `/open`, `/save` etc. sollten als Befehle
-erscheinen.
-
-### 6. (Optional) Daemon-Rollen installieren
+Danach im Terminal:
 
 ```bash
-bibi-ctrl daemon install
+git diff .claude/skills/        # Änderungen prüfen
+git add .claude/skills/
+git commit -m "upgrade: bibi skills <version/commit>"
+git push origin trunk
 ```
 
-Liest `~/.config/bibi/env` als Env-Quelle. Welche Rollen je Knotentyp sinnvoll
-sind, ergänzt das Team hier, sobald die Laufzeit steht (spätere Phasen).
+**Neuen Skill hinzufügen:**
+
+1. Eintrag in `library.yaml` ergänzen (Source-URL auf neue SKILL.md)
+2. `/library use <name>` aufrufen
+3. Commit + Push
+
+### library.yaml aktuell halten
+
+Nach jedem Install/Upgrade den Kommentar in `library.yaml` aktualisieren:
+
+```yaml
+# Aktuell installiert von: plan-net-journey/bibi@<commit> (master)
+```
+
+So ist immer nachvollziehbar, welche Engine-Version die vendored Skills lieferte.

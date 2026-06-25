@@ -12,12 +12,9 @@ data/*
 # Hinweis: ~/.config/bibi/env liegt AUSSERHALB des Repos (von `bibi-ctrl init`
 # erzeugt) und wird hier nur dokumentiert — siehe INSTALL.md.
 
-# Skills und Agents — via /library sync installiert, nicht versioniert (DESIGN §3.3).
-# library.yaml deklariert was installiert wird; die Dateien selbst sind Artefakte.
-.claude/skills/*
-!.claude/skills/.gitkeep
-.claude/agents/*
-!.claude/agents/.gitkeep
+# Skills und Agents sind COMMITTED (Vendoring-Modell, DESIGN §3.3).
+# library.yaml ist das Manifest; the-library ist nur für Install/Upgrade des
+# Maintainers. Andere Entwickler erhalten alle Skills via git clone.
 
 # Python
 __pycache__/

@@ -1,12 +1,17 @@
-# bibi-team — Skill-Katalog (DESIGN §3.3)
+# bibi-team — Skill-Manifest (Plugin-System, DESIGN §3.3)
 #
-# Diese Datei ist die REFERENZLISTE der für das Team-Repo benötigten Skills.
-# Sie ist KEINE Katalog-Datei, die the-library direkt liest — der persönliche
-# Katalog liegt in ~/.claude/skills/library/library.yaml (in der eigenen Fork).
+# Modell: Vendoring — Skills sind committed (.claude/skills/), nicht gitignored.
+# Die-library ist NUR Werkzeug für den Maintainer (initialer Install + Upgrades).
+# Andere Entwickler: git clone → Skills sofort da, kein the-library nötig.
 #
-# Workflow: Diese Liste in die persönliche library.yaml kopieren (oder via
-# /library add eintragen), dann im Team-Repo /library use <name> aufrufen.
-# Siehe INSTALL.md Schritt 4 für den vollständigen Ablauf.
+# Aktuell installiert von: plan-net-journey/bibi@f0b4b7e (master)
+# Upgrade: /library sync im Team-Repo → git diff prüfen → commit + push
+#
+# Workflow für Maintainer:
+#   Install:  /library use <name>    (einmalig oder nach Hinzufügen)
+#   Upgrade:  /library sync          (alle installierten Skills aktualisieren)
+#   Prüfen:   git diff .claude/skills/
+#   Committen: git add .claude/skills/ && git commit -m "upgrade: bibi skills <version>"
 
 default_dirs:
   skills:
