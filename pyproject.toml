@@ -7,5 +7,7 @@ dependencies = [
     # Engine als Abhängigkeit (DESIGN §3.2). Privates Repo — Installation
     # benötigt GitHub-Auth (gh/credential-helper). Für lokale Entwicklung
     # stattdessen: uv pip install -e ../bibi  (siehe INSTALL.md).
-    "bibi @ git+https://github.com/plan-net-journey/bibi.git@trunk",
+    # Branch @dev während der aktiven Entwicklung (Engine-Default ist master/
+    # Release; @trunk existiert nicht). Vor Release auf @master umstellen.
+    "bibi @ git+https://github.com/plan-net-journey/bibi.git@dev",
 ]
