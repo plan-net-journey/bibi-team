@@ -1,35 +1,47 @@
+# bibi-team — Skill-Katalog (DESIGN §3.3)
+#
+# Diese Datei ist die REFERENZLISTE der für das Team-Repo benötigten Skills.
+# Sie ist KEINE Katalog-Datei, die the-library direkt liest — der persönliche
+# Katalog liegt in ~/.claude/skills/library/library.yaml (in der eigenen Fork).
+#
+# Workflow: Diese Liste in die persönliche library.yaml kopieren (oder via
+# /library add eintragen), dann im Team-Repo /library use <name> aufrufen.
+# Siehe INSTALL.md Schritt 4 für den vollständigen Ablauf.
+
 default_dirs:
   skills:
     - default: .claude/skills/
     - global: ~/.claude/skills/
   agents:
     - default: .claude/agents/
+    - global: ~/.claude/agents/
   prompts:
     - default: .claude/commands/
+    - global: ~/.claude/commands/
 
 library:
   skills:
     - name: open
-      description: Case öffnen oder reaktivieren
-      source: https://github.com/plan-net-journey/bibi/tree/master/skills/open
+      description: Case öffnen oder reaktivieren (Substring-Match)
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/open/SKILL.md
     - name: save
       description: Status committen und pushen
-      source: https://github.com/plan-net-journey/bibi/tree/master/skills/save
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/save/SKILL.md
       requires: [skill:sync]
     - name: close
       description: Case pausieren
-      source: https://github.com/plan-net-journey/bibi/tree/master/skills/close
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/close/SKILL.md
       requires: [skill:save]
     - name: done
-      description: Case abschliessen
-      source: https://github.com/plan-net-journey/bibi/tree/master/skills/done
+      description: Case abschliessen (final)
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/done/SKILL.md
       requires: [skill:save]
     - name: delete
       description: Case unwiderruflich löschen
-      source: https://github.com/plan-net-journey/bibi/tree/master/skills/delete
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/delete/SKILL.md
     - name: protocol
       description: Per-Turn-Logging ein-/ausschalten
-      source: https://github.com/plan-net-journey/bibi/tree/master/skills/protocol
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/protocol/SKILL.md
     - name: sync
-      description: Repo manuell oder automatisch synchronisieren
-      source: https://github.com/plan-net-journey/bibi/tree/master/skills/sync
+      description: Repo manuell synchronisieren oder auto_sync konfigurieren
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/sync/SKILL.md
