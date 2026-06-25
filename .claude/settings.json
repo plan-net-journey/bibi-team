@@ -1,4 +1,8 @@
 {
+  "statusLine": {
+    "type": "command",
+    "command": "bibi-ctrl statusline"
+  },
   "hooks": {
     "SessionStart": [
       {
