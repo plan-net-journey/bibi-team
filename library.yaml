@@ -4,7 +4,7 @@
 # Die-library ist NUR Werkzeug für den Maintainer (initialer Install + Upgrades).
 # Andere Entwickler: git clone → Skills sofort da, kein the-library nötig.
 #
-# Aktuell installiert von: plan-net-journey/bibi@f0b4b7e (master)
+# Aktuell installiert von: plan-net-journey/bibi@7667efc (master)
 # Upgrade: /library sync im Team-Repo → git diff prüfen → commit + push
 #
 # Workflow für Maintainer:
