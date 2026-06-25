@@ -1,6 +1,10 @@
 # Repo-globaler Laufzeit-State (DESIGN §3.2) — eine geteilte Kopie, nicht versioniert
 .claude/.state.md
 
+# Per-Maschine CC-Settings (Permissions, persönliche Prefs) — nicht versioniert.
+# Die committete settings.json trägt die team-weiten Hooks + Safe-Baseline.
+.claude/settings.local.json
+
 # Runtime-State: SQLite, Worktrees, Job-Logs (Verzeichnis bleibt via .gitkeep sichtbar)
 data/*
 !data/.gitkeep
