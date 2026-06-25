@@ -89,26 +89,32 @@ und legt sie in `.claude/skills/`. Der Maintainer prüft den Diff und committet.
 
 ### The-library einrichten (einmalig)
 
-**1. Fork erstellen**
+**1. Privaten Mirror anlegen** — *kein* Fork: ein Fork von `disler/the-library`
+(public) wäre auf GitHub zwangsläufig public. Stattdessen ein eigenes privates
+Repo, das den Upstream spiegelt:
 
 ```bash
-gh repo fork disler/the-library --private --clone=false
+gh repo create plan-net-journey/the-library --private
+git clone --bare https://github.com/disler/the-library.git /tmp/the-library.git
+git -C /tmp/the-library.git push --mirror https://github.com/plan-net-journey/the-library.git
+rm -rf /tmp/the-library.git
 ```
 
-**2. In globales Skills-Verzeichnis klonen**
+**2. In globales Skills-Verzeichnis klonen** (`upstream` für spätere Updates):
 
 ```bash
-gh repo clone <dein-github-name>/the-library ~/.claude/skills/library
+gh repo clone plan-net-journey/the-library ~/.claude/skills/library
+git -C ~/.claude/skills/library remote add upstream https://github.com/disler/the-library.git
 ```
 
 `/library` ist damit in jeder Claude-Code-Session global verfügbar.
 
-**3. Fork-URL eintragen**
+**3. Repo-URL eintragen**
 
 In `~/.claude/skills/library/SKILL.md` den `## Variables`-Abschnitt anpassen:
 
 ```markdown
-- **LIBRARY_REPO_URL**: `https://github.com/<dein-github-name>/the-library.git`
+- **LIBRARY_REPO_URL**: `https://github.com/plan-net-journey/the-library`
 ```
 
 `LIBRARY_YAML_PATH` und `LIBRARY_SKILL_DIR` bleiben unverändert.
@@ -129,10 +135,17 @@ Neue Claude-Code-Session starten → `/library list` zeigt den leeren Katalog.
 /library use delete
 /library use protocol
 /library use sync
+/library use state
 ```
 
 > `plan-net-journey/bibi` ist privat — the-library nutzt automatisch die
 > `gh`-Credentials.
+
+> **Naming (Option A):** Die Engine-Quellordner sind gruppiert (`skills/case-*`,
+> `skills/bibi-*`), der Katalog-`name:` ist aber **bare**. the-library installiert
+> nach `.claude/skills/<name>/`, und CC leitet den Slash-Befehl aus dem
+> Installationsordner ab → Quelle `case-open` ⇒ `name: open` ⇒ Befehl `/open`.
+> (`status` heißt `state`, da `/status` ein CC-Builtin ist.)
 
 **Upgrade** (nach Engine-Update):
 
@@ -160,7 +173,11 @@ git push origin trunk
 Nach jedem Install/Upgrade den Kommentar in `library.yaml` aktualisieren:
 
 ```yaml
-# Aktuell installiert von: plan-net-journey/bibi@<commit> (master)
+# Aktuell installiert von: plan-net-journey/bibi@<commit> (dev)
 ```
+
+> Branch: vor dem Release wird auf `dev` entwickelt (gruppierte `skills/case-*`-
+> Struktur) — `source:` zeigt entsprechend auf `@dev`. Nach `dev → master` auf
+> `@master` heben.
 
 So ist immer nachvollziehbar, welche Engine-Version die vendored Skills lieferte.
