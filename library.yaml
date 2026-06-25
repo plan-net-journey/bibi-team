@@ -50,3 +50,8 @@ library:
     - name: sync
       description: Repo manuell synchronisieren oder auto_sync konfigurieren
       source: https://github.com/plan-net-journey/bibi/blob/master/skills/sync/SKILL.md
+    # T5: neuer Skill (Read-only Zustandsanzeige). Noch local-dev — nach Release
+    # auf @master umstellen.
+    - name: status
+      description: Aktuellen bibi-Zustand anzeigen (Read-only)
+      source: /Users/raum/Project/bibi4/skills/status/SKILL.md
