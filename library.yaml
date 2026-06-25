@@ -4,7 +4,11 @@
 # Die-library ist NUR Werkzeug für den Maintainer (initialer Install + Upgrades).
 # Andere Entwickler: git clone → Skills sofort da, kein the-library nötig.
 #
-# Aktuell installiert von: plan-net-journey/bibi@7667efc (master)
+# Naming (Option A): Engine-Quellordner sind gruppiert (skills/case-*, bibi-*),
+# der Katalog-`name:` ist bare → installiert als .claude/skills/<name>/ → der
+# Slash-Befehl ist bare (/open, /save, /state …). Siehe DESIGN §3.6.
+#
+# Aktuell installiert von: plan-net-journey/bibi@f3e8cb5 (dev)
 # Upgrade: /library sync im Team-Repo → git diff prüfen → commit + push
 #
 # Workflow für Maintainer:
@@ -28,30 +32,28 @@ library:
   skills:
     - name: open
       description: Case öffnen oder reaktivieren (Substring-Match)
-      source: https://github.com/plan-net-journey/bibi/blob/master/skills/open/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/case-open/SKILL.md
     - name: save
       description: Status committen und pushen
-      source: https://github.com/plan-net-journey/bibi/blob/master/skills/save/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/case-save/SKILL.md
       requires: [skill:sync]
     - name: close
       description: Case pausieren
-      source: https://github.com/plan-net-journey/bibi/blob/master/skills/close/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/case-close/SKILL.md
       requires: [skill:save]
     - name: done
       description: Case abschliessen (final)
-      source: https://github.com/plan-net-journey/bibi/blob/master/skills/done/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/case-done/SKILL.md
       requires: [skill:save]
     - name: delete
       description: Case unwiderruflich löschen
-      source: https://github.com/plan-net-journey/bibi/blob/master/skills/delete/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/case-delete/SKILL.md
     - name: protocol
       description: Per-Turn-Logging ein-/ausschalten
-      source: https://github.com/plan-net-journey/bibi/blob/master/skills/protocol/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/case-protocol/SKILL.md
     - name: sync
       description: Repo manuell synchronisieren oder auto_sync konfigurieren
-      source: https://github.com/plan-net-journey/bibi/blob/master/skills/sync/SKILL.md
-    # T5: neuer Skill (Read-only Zustandsanzeige). Noch local-dev — nach Release
-    # auf @master umstellen.
-    - name: status
+      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/bibi-sync/SKILL.md
+    - name: state
       description: Aktuellen bibi-Zustand anzeigen (Read-only)
-      source: /Users/raum/Project/bibi4/skills/status/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/bibi-state/SKILL.md
