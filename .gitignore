@@ -5,6 +5,9 @@
 # Die committete settings.json trägt die team-weiten Hooks + Safe-Baseline.
 .claude/settings.local.json
 
+# Obsidian-Workspace/-Config (user-/maschinenspezifisch) — nicht ins Team-Repo.
+.obsidian/
+
 # Runtime-State: SQLite, Worktrees, Job-Logs (Verzeichnis bleibt via .gitkeep sichtbar)
 data/*
 !data/.gitkeep
