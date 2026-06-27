@@ -9,6 +9,12 @@
 data/*
 !data/.gitkeep
 
+# Gesammelte/rohe Flat-File-Daten (News, Kurse …) — im Vault auf Platte, aber NICHT
+# in git: wachsende/rotierende Rohdaten würden die History unbeschränkt aufblähen
+# (DESIGN §3.5). Konvention: pro Case ein gitignorierter `data/`-Unterordner.
+# Committet werden nur Code, Config und verdichtete Ergebnisse. Prüfen: `bibi-ctrl doctor`.
+vault/case/*/data/
+
 # Hinweis: ~/.config/bibi/env liegt AUSSERHALB des Repos (von `bibi-ctrl init`
 # erzeugt) und wird hier nur dokumentiert — siehe INSTALL.md.
 
