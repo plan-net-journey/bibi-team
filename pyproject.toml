@@ -4,10 +4,11 @@ version = "0.0.0"
 description = "Team-Repo der bibi-Engine — deklariert bibi als Abhängigkeit"
 requires-python = ">=3.11"
 dependencies = [
-    # Engine als Abhängigkeit (DESIGN §3.2). Privates Repo — Installation
-    # benötigt GitHub-Auth (gh/credential-helper). Für lokale Entwicklung
-    # stattdessen: uv pip install -e ../bibi  (siehe INSTALL.md).
+    # Engine als Abhängigkeit (DESIGN §3.2). Privates Repo auf Gitea — Installation
+    # nutzt die im git-credential-helper hinterlegten Gitea-Credentials (store auf
+    # Linux, Keychain auf macOS). Für lokale Entwicklung stattdessen:
+    # uv pip install -e ../bibi  (siehe INSTALL.md).
     # Branch @dev während der aktiven Entwicklung (Engine-Default ist master/
     # Release; @trunk existiert nicht). Vor Release auf @master umstellen.
-    "bibi @ git+https://github.com/plan-net-journey/bibi.git@dev",
+    "bibi @ git+http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi.git@dev",
 ]

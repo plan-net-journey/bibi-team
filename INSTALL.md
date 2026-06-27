@@ -11,15 +11,17 @@ Skills sind committed — nach dem Clone sofort verfügbar, kein the-library nö
 ### Voraussetzungen
 
 - [`uv`](https://docs.astral.sh/uv/) installiert
-- [`gh`](https://cli.github.com/) installiert und eingeloggt (`gh auth login`)
+- `git` mit hinterlegten **Gitea-Credentials** (credential-helper: `store` auf
+  Linux, Keychain auf macOS) — die Repos sind privat.
 
 ### Schritte
 
-**1. Repo klonen**
+**1. Instanz-Repo klonen** — das eigene Team-Repo, zuvor per Gitea-Template aus
+dem Blueprint erzeugt (DESIGN §4.10 Schritt 0). `INSTANZ` = dein Repo-Name:
 
 ```bash
-gh repo clone plan-net-journey/bibi-team
-cd bibi-team
+git clone http://sarasate.tail9f9173.ts.net:3000/m.rau/INSTANZ.git
+cd INSTANZ
 ```
 
 **2. Engine installieren**
@@ -49,7 +51,7 @@ nie versioniert):
 |---|---|---|
 | `BIBI_SCHEDULER_URL` | `http://sarasate:8769` | wohin `--connect` zeigt |
 | `BIBI_ROLE` | `worker,synchronizer` | kombinierte Rollen dieses Knotens |
-| `BIBI_REMOTE` | `https://github.com/plan-net-journey/bibi-team.git` | Git-Remote für Synchronizer |
+| `BIBI_REMOTE` | `http://sarasate…:3000/m.rau/INSTANZ.git` | Git-Remote für Synchronizer |
 
 **4. Verify**
 
@@ -87,34 +89,47 @@ the-library           ← Werkzeug für Install/Upgrade (nur für Maintainer)
 The-library liest `library.yaml`, zieht Skill-Dateien aus dem Engine-Repo
 und legt sie in `.claude/skills/`. Der Maintainer prüft den Diff und committet.
 
+> **Noch offen (Track C):** the-library parst in `SKILL.md` bislang nur
+> **GitHub**-Quell-URLs und klont `github.com/…`. Damit `/library use|sync` gegen
+> Gitea funktioniert, müssen die „Source Format"-/„Source Parsing"-Regeln um das
+> Gitea-Schema erweitert werden (`…/m.rau/<repo>/raw/branch/<branch>/<pfad>`,
+> Klon-URL `…/m.rau/<repo>.git`) **oder** die Katalog-`source:` auf lokale Pfade
+> umgestellt werden. Bis dahin reicht das hier eingerichtete Vendoring (Skills
+> sind committed), `/library`-Upgrades sind erst nach Track C nutzbar.
+
 ### The-library einrichten (einmalig)
 
-**1. Privaten Mirror anlegen** — *kein* Fork: ein Fork von `disler/the-library`
-(public) wäre auf GitHub zwangsläufig public. Stattdessen ein eigenes privates
-Repo, das den Upstream spiegelt:
+**1. Privaten Mirror anlegen** — *kein* Fork: ein Fork des public
+`disler/the-library` wäre zwangsläufig public. Stattdessen ein eigenes privates
+**Gitea**-Repo, das den Upstream spiegelt (bereits angelegt als `m.rau/the-library`):
 
 ```bash
-gh repo create plan-net-journey/the-library --private
+# Gitea-Repo anlegen (falls noch nicht vorhanden):
+curl -X POST -u USER:TOKEN -H 'Content-Type: application/json' \
+  -d '{"name":"the-library","private":true}' \
+  http://sarasate.tail9f9173.ts.net:3000/api/v1/user/repos
+# Upstream hineinspiegeln:
 git clone --bare https://github.com/disler/the-library.git /tmp/the-library.git
-git -C /tmp/the-library.git push --mirror https://github.com/plan-net-journey/the-library.git
+git -C /tmp/the-library.git push --mirror http://sarasate.tail9f9173.ts.net:3000/m.rau/the-library.git
 rm -rf /tmp/the-library.git
 ```
 
-**2. In globales Skills-Verzeichnis klonen** (`upstream` für spätere Updates):
+**2. In globales Skills-Verzeichnis klonen:**
 
 ```bash
-gh repo clone plan-net-journey/the-library ~/.claude/skills/library
-git -C ~/.claude/skills/library remote add upstream https://github.com/disler/the-library.git
+git clone http://sarasate.tail9f9173.ts.net:3000/m.rau/the-library.git ~/.claude/skills/library
 ```
 
-`/library` ist damit in jeder Claude-Code-Session global verfügbar.
+`/library` ist damit in jeder Claude-Code-Session global verfügbar. (Ein
+`upstream`-Remote auf das public `disler/the-library` für spätere Tool-Updates
+ist optional und der einzige verbleibende GitHub-Berührungspunkt.)
 
 **3. Repo-URL eintragen**
 
 In `~/.claude/skills/library/SKILL.md` den `## Variables`-Abschnitt anpassen:
 
 ```markdown
-- **LIBRARY_REPO_URL**: `https://github.com/plan-net-journey/the-library`
+- **LIBRARY_REPO_URL**: `http://sarasate.tail9f9173.ts.net:3000/m.rau/the-library`
 ```
 
 `LIBRARY_YAML_PATH` und `LIBRARY_SKILL_DIR` bleiben unverändert.
@@ -138,8 +153,8 @@ Neue Claude-Code-Session starten → `/library list` zeigt den leeren Katalog.
 /library use state
 ```
 
-> `plan-net-journey/bibi` ist privat — the-library nutzt automatisch die
-> `gh`-Credentials.
+> `m.rau/bibi` ist privat — the-library nutzt die im git-credential-helper
+> hinterlegten Gitea-Credentials (siehe Track-C-Hinweis oben).
 
 > **Naming (Option A):** Die Engine-Quellordner sind gruppiert (`skills/case-*`,
 > `skills/bibi-*`), der Katalog-`name:` ist aber **bare**. the-library installiert
