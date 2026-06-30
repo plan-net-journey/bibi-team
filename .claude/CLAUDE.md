@@ -24,9 +24,12 @@ installieren → `bibi-ctrl init`.
 
 ## Konventionen
 
-Die maßgeblichen Bibi4-Konventionen und das Design leben (vorerst) im
-Engine-/Design-Kontext des Vorhabens. Permanente, für alle geltende Regeln werden
-committet hier ergänzt, sobald die ersten Skills migriert sind (Phase 1).
+Die für alle geltenden Vault-Konventionen — Sprache, Slash-Commands, Vokabular,
+Top-Level-Ordner (`case`/`memo`/`etc`), Naming, Frontmatter und die Idee hinter
+`case` und `memo` — stehen committet in
+[`vault/CONVENTIONS.md`](../vault/CONVENTIONS.md). **Jedes bibi-team-Repo MUSS
+diese Datei führen** — `bibi-ctrl doctor` meldet ihr Fehlen. Das maßgebliche
+Engine-Design liegt separat im Projekt-Vault (`DESIGN.md`).
 
 ### Daten-Hygiene im Vault (DESIGN §3.5)
 
