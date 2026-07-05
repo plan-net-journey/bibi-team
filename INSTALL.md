@@ -112,20 +112,46 @@ uv pip install -e "../bibi[daemon]"
 (`bibi-ctrl init`, dann `bibi-ctrl daemon install`).
 
 > **Falle — editierbares Install ist fragil:** jeder `uv run bibi-ctrl …`-
-> Aufruf synct das venv gegen die in `pyproject.toml` deklarierte
+> Aufruf synct das venv gegen die in `pyproject.toml`/`uv.lock` deklarierte
 > Git-Abhängigkeit zurück — **auch der `ExecStart` der systemd/launchd-Unit
 > bei jedem Neustart.** Der editierbare Install gegen `/srv/bibi` wird dabei
-> durch einen frischen Checkout von `origin/dev` ersetzt. Funktional meist
-> unkritisch (der Re-Sync installiert exakt den aktuellen `origin/dev`-Commit),
-> aber kein echtes „editable" mehr, sobald der Daemon einmal neu gestartet
-> hat. Für alle direkten CLI-Aufrufe daher `.venv/bin/bibi-ctrl` verwenden,
-> nicht `uv run bibi-ctrl` — Letzteres reproduziert die Falle bei jedem Aufruf.
+> durch einen regulären Install ersetzt — kein echtes „editable" mehr, sobald
+> der Daemon einmal neu gestartet hat. Für alle direkten CLI-Aufrufe daher
+> `.venv/bin/bibi-ctrl` verwenden, nicht `uv run bibi-ctrl` — Letzteres
+> reproduziert die Falle bei jedem Aufruf.
+>
+> **Korrektur (2026-07-05, empirisch widerlegt):** der Re-Sync installiert
+> **nicht** automatisch den aktuellen `origin/dev`-Commit, sondern exakt den in
+> `uv.lock` **eingefrorenen** Commit-Hash (`bibi.git?rev=dev#<sha>`) — `uv`
+> löst den Branch beim Lockfile-Erstellen einmalig auf ein festes SHA auf und
+> rührt es danach nicht mehr an. Ein Engine-Fix auf `dev` kommt also **nicht**
+> von selbst an, nur weil man den Daemon neu startet. Deploy-Reihenfolge für
+> einen Engine-Fix:
+> 1. Fix in `bibi` auf `dev` committen + pushen.
+> 2. Im Instanz-Repo (`bibi-notes`/`INSTANZ`) `uv lock --upgrade-package bibi`
+>    ausführen — hebt den gepinnten Commit im `uv.lock` an.
+> 3. `uv.lock`-Änderung committen + pushen, dort ankommen lassen (Pull/Sync).
+> 4. Erst dann bringt ein Daemon-Neustart (`systemctl restart …`) den neuen
+>    Engine-Commit tatsächlich ins laufende venv.
 
 > **Falle — Snap-`uv` bricht die systemd-Unit:** `bibi-ctrl daemon install`
 > meidet bewusst `/snap/bin/uv` (Snap-Sandbox unverträglich mit systemd) und
 > bevorzugt `~/.local/bin/uv` (astral-Standalone-Installer). Falls nur
 > Snap-`uv` vorhanden ist, zuerst nachinstallieren:
 > `curl -LsSf https://astral.sh/uv/install.sh | sh`.
+
+> **Nicht vergessen — `auto_sync on` setzen:** ein unbeaufsichtigter Host hat
+> niemanden, der einem Push zustimmen könnte; bleibt `auto_sync` auf `off`
+> (Default), pusht der Synchronizer nie automatisch, während er weiterhin
+> unauffällig pullt. Lokale Job-Run-Commits (Collector-/Digest-Läufe,
+> `agent/*`-Mergebacks) akkumulieren dann unbegrenzt, bis irgendwann von
+> woanders gepusht wird — dann trifft ein großer Rückstand auf einen frischen
+> Fremd-Push, was Divergenz-/Sync-Konflikte provoziert (real passiert,
+> 2026-07-05, Details in `bibi-notes`' `Migration.md`). Nach
+> `bibi-ctrl daemon install` daher immer auch:
+> ```bash
+> .venv/bin/bibi-ctrl sync on
+> ```
 
 ---
 
