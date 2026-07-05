@@ -24,6 +24,16 @@ they are names, not prose. A user-facing **confirmation** the model speaks
 follows the runtime rule and is German, even inside an otherwise-English
 instruction file — the split is by audience, not by file.
 
+## Markdown style
+
+Write each paragraph or bullet as **one physical line**, however long — never
+hard-wrap flowing prose across multiple lines the way traditional 80-column
+text wrapping does; let the editor/viewer soft-wrap instead. List items, table
+rows, blockquote lines, and code fences legitimately break per line; ordinary
+flowing prose does not. This keeps diffs minimal (editing one clause doesn't
+re-flow the whole paragraph) and matches how the `==name:==`-annotation
+dialogues in this vault are written (e.g. `case/*/Routing-Analyse.md`).
+
 ## Top-level folders
 
 The default vault layout is three folders plus this file:

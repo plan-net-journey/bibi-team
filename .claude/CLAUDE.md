@@ -53,3 +53,17 @@ wo es tatsächlich läuft — eigene Repos, Hosts, aktive Daemon-Instanzen,
 Rollen-Zuordnung. Anders als `CONVENTIONS.md` ist das **kein generisches
 Muster**, sondern instanzspezifischer Live-Stand — die Datei hier ist nur ein
 Platzhalter-Template zum Ausfüllen, nicht der echte Stand irgendeines Teams.
+
+## Cross-Repo-Abstimmung
+
+Diese Team-Repo-Instanz, das `bibi-team`-Blueprint, aus dem sie hervorging,
+und die `bibi`-Engine, von der sie abhängt, entwickeln sich zusammen, leben
+aber in getrennten Repos. Vor jeder Änderung in diesem Ökosystem klären:
+welchem Repo sie eigentlich gehört (Engine-Code vs. private Instanz-Daten
+vs. eine generische Skelett-/Konventions-Verbesserung, die auch andere Teams
+bekommen sollten); welche Doku in jedem betroffenen Repo nachgezogen werden
+muss (`README.md`, `CONVENTIONS.md`, `INSTALL.md`, `DESIGN.md`, diese Datei);
+und ob eine abhängige Umgebung neu installiert/deployt werden muss, um eine
+Engine-Änderung zu übernehmen. Eine generische Konventions-/Doku-Verbesserung
+in einer Team-Instanz sollte gegen `bibi-team` abgeglichen werden, damit
+künftige Teams sie erben — und umgekehrt.
