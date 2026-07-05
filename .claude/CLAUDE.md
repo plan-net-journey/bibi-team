@@ -45,3 +45,11 @@ DB-Schichten. Damit das git-seitig nicht entgleist, zwei Regeln:
 
 **Prüfen:** `bibi-ctrl doctor` meldet fehlendes git-lfs, große nicht-LFS-Blobs und
 committete Sammeldaten (Exit ≠ 0 bei Befunden — pre-commit/CI-tauglich).
+
+## Topologie
+
+Jedes Team sollte in [`vault/TOPOLOGIE.md`](../vault/TOPOLOGIE.md) festhalten,
+wo es tatsächlich läuft — eigene Repos, Hosts, aktive Daemon-Instanzen,
+Rollen-Zuordnung. Anders als `CONVENTIONS.md` ist das **kein generisches
+Muster**, sondern instanzspezifischer Live-Stand — die Datei hier ist nur ein
+Platzhalter-Template zum Ausfüllen, nicht der echte Stand irgendeines Teams.

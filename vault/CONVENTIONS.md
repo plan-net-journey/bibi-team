@@ -47,7 +47,14 @@ and `etc/` are pure vault conventions — the engine never parses them.
   `case/YYYYmmdd.<slug>-<short>/` holding a `README.md` plus any further files,
   attachments, and sub-files. Carries a lifecycle (`open` → `paused`/`closed`),
   may host schedule or `at:` MDs (the scheduler fires them) and its own `data/`
-  subfolder.
+  subfolder. `create_case` always places new cases flat, directly under
+  `case/`; but a case may later be **moved** into subfolders for archiving
+  (e.g. `case/2026/06/20260612.FooBar-deadbeef/`) — `/open`'s substring match
+  searches recursively, so a moved case is still found and reactivated by its
+  slug. This also covers legacy folders predating the `-<short>` suffix
+  convention (`case/2026/20260531.LegacyThing/`, no hash in the name): as long
+  as `README.md` carries a `slug` key, the folder is recognized as a case leaf
+  by its frontmatter instead of by name pattern.
 - **memo** — a *single, self-contained note*: **one file** under `memo/`,
   anchored to a date or a date + theme (a meeting, an event, a topic).
   Attachments (screenshots, embeddings) may sit alongside in `memo/`, but the
