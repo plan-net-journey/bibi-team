@@ -73,6 +73,62 @@ Laufzeit steht (spätere Phasen).
 
 ---
 
+## Für Produktions-/Server-Deploy (z. B. sarasate)
+
+Abweichend vom Entwickler-Setup oben: Engine + Instanz als **eigene,
+separate Klone** unter `/srv/` (nicht `~/Project/`), Daemon läuft dauerhaft
+über systemd. Reales Vorbild: `bibi-notes` auf sarasate (2026-07-04,
+Details/Protokoll in dessen `vault/case/…/Migration.md`).
+
+**1. Verzeichnisse anlegen** (einmalig `sudo` für `/srv/`):
+
+```bash
+sudo mkdir -p /srv/bibi /srv/INSTANZ
+sudo chown "$(whoami):$(whoami)" /srv/bibi /srv/INSTANZ
+```
+
+**2. Klonen als Geschwister-Ordner** (Pflicht für den editierbaren Install
+in Schritt 3 — `-e ../bibi` ist relativ):
+
+```bash
+git clone -b dev http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi.git /srv/bibi
+git clone -b trunk http://sarasate.tail9f9173.ts.net:3000/m.rau/INSTANZ.git /srv/INSTANZ
+```
+
+**3. venv + editierbares Install — mit `[daemon]`-Extra:**
+
+```bash
+cd /srv/INSTANZ
+uv venv
+uv pip install -e "../bibi[daemon]"
+```
+
+> **Falle:** `uv pip install -e ../bibi` (ohne `[daemon]`) installiert
+> `fastapi`/`uvicorn` **nicht** mit — `daemon` ist im Engine-`pyproject.toml`
+> ein optionales Extra, kein Basis-Dependency. Ohne es crash-loopt der
+> Daemon mit `ModuleNotFoundError: No module named 'uvicorn'`.
+
+**4. Knoten bootstrappen + Daemon installieren** — wie oben, Schritte 3+5
+(`bibi-ctrl init`, dann `bibi-ctrl daemon install`).
+
+> **Falle — editierbares Install ist fragil:** jeder `uv run bibi-ctrl …`-
+> Aufruf synct das venv gegen die in `pyproject.toml` deklarierte
+> Git-Abhängigkeit zurück — **auch der `ExecStart` der systemd/launchd-Unit
+> bei jedem Neustart.** Der editierbare Install gegen `/srv/bibi` wird dabei
+> durch einen frischen Checkout von `origin/dev` ersetzt. Funktional meist
+> unkritisch (der Re-Sync installiert exakt den aktuellen `origin/dev`-Commit),
+> aber kein echtes „editable" mehr, sobald der Daemon einmal neu gestartet
+> hat. Für alle direkten CLI-Aufrufe daher `.venv/bin/bibi-ctrl` verwenden,
+> nicht `uv run bibi-ctrl` — Letzteres reproduziert die Falle bei jedem Aufruf.
+
+> **Falle — Snap-`uv` bricht die systemd-Unit:** `bibi-ctrl daemon install`
+> meidet bewusst `/snap/bin/uv` (Snap-Sandbox unverträglich mit systemd) und
+> bevorzugt `~/.local/bin/uv` (astral-Standalone-Installer). Falls nur
+> Snap-`uv` vorhanden ist, zuerst nachinstallieren:
+> `curl -LsSf https://astral.sh/uv/install.sh | sh`.
+
+---
+
 ## Für den Skills-Maintainer
 
 Der Maintainer verwaltet das Plugin-System: er installiert neue Skills und
@@ -188,7 +244,7 @@ git push origin trunk
 Nach jedem Install/Upgrade den Kommentar in `library.yaml` aktualisieren:
 
 ```yaml
-# Aktuell installiert von: plan-net-journey/bibi@<commit> (dev)
+# Aktuell installiert von: m.rau/bibi@<commit> (dev)
 ```
 
 > Branch: vor dem Release wird auf `dev` entwickelt (gruppierte `skills/case-*`-
