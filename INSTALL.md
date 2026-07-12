@@ -52,6 +52,7 @@ nie versioniert):
 | `BIBI_SCHEDULER_URL` | `http://sarasate:8769` | wohin `--connect` zeigt |
 | `BIBI_ROLE` | `worker,synchronizer` | kombinierte Rollen dieses Knotens |
 | `BIBI_REMOTE` | `http://sarasate…:3000/m.rau/INSTANZ.git` | Git-Remote für Synchronizer |
+| `BIBI_STATUS_POLL_INTERVAL` | `30` | Poll-Intervall (Sekunden) der Feed-Status-Kacheln, Default 30 |
 
 **4. Verify**
 
