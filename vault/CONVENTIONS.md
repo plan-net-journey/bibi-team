@@ -170,13 +170,15 @@ Convention: two XDG-style roots under the job-owning host's real home directory,
 
 **Team-trust model:** `BIBI_JOB_ENV_*` is deliberately unscoped — every container job on a node sees every credential declared there, not just the ones it needs. This mirrors `exec_mode: host`, where every job already runs as the same OS user with full filesystem access (zero job-to-job isolation there either); the data mount and the env-var mechanism both just extend that same existing trust boundary to container mode rather than inventing a stricter one. Weigh this before wiring up a **write**-scoped credential this way — a read-only scope is lower-stakes than one that can mutate, and deserves a deliberate decision, not a reflexive copy-paste.
 
-## Collector scripts: `uv run --script`, never `uv run python`
+## Job scripts: `uv run --script`, never `uv run python`
 
-A `job:` payload that runs a Python script (`uv run python <file>.py`, no `--script`) resolves its dependencies by walking **upward from the job's cwd looking for a `pyproject.toml`** — same as running that command by hand anywhere in the repo. In a job's worktree/container that search reliably finds the *team repo's own root* `pyproject.toml`, not anything script-specific — there usually isn't one lower down to stop the walk. This team repo's root `pyproject.toml` declares exactly one dependency: the `bibi` engine itself, pinned via a **private, self-hosted git remote** (`bibi[daemon] @ git+http://…/bibi.git@dev`).
+Applies to **any** `job:` payload that runs a Python script this way — not just collectors, and not only scripts with external dependencies. `uv run <file>.py` (no `--script`) runs in **project mode**: it resolves dependencies by walking **upward from the job's cwd looking for a `pyproject.toml`**, same as running that command by hand anywhere in the repo — and, critically, project mode syncs the *whole* project's declared dependencies before running anything, regardless of what the invoked script itself actually imports. Even a pure-stdlib script with zero real dependencies pays this cost.
 
-On the host this is invisible — a developer's shell already has that remote authenticated (cached credential helper, prior clone) — so the script appears to work. Inside `exec_mode: container` there is no such credential (fresh filesystem, no `~/.git-credentials`, no keychain access), so `uv` tries to `git fetch` the private remote to resolve the environment and fails outright: `fatal: could not read Username for '…': terminal prompts disabled`. The failure has nothing to do with the script's actual imports (whatever they are) — it never gets that far.
+In a job's worktree/container that upward search reliably finds the *team repo's own root* `pyproject.toml` — there usually isn't a closer one to stop the walk. This team repo's root `pyproject.toml` declares exactly one dependency: the `bibi` engine itself, pinned via a **private, self-hosted git remote** (`bibi[daemon] @ git+http://…/bibi.git@dev`).
 
-**Fix, and the rule going forward:** every collector script gets its own PEP 723 header declaring exactly the dependencies it needs, and is invoked with `uv run --script <file>.py` — this resolves an isolated, ephemeral environment from the header alone, never searching upward for a project file at all, so the team repo's own `bibi` dependency (and the private-remote auth it needs) never enters the picture:
+On the host this is invisible — a developer's shell already has that remote authenticated (cached credential helper, prior clone) — so the script appears to work. Inside `exec_mode: container` there is no such credential (fresh filesystem, no `~/.git-credentials`, no keychain access), so `uv` tries to `git fetch` the private remote to resolve the project environment and fails outright: `fatal: could not read Username for '…': terminal prompts disabled`. The failure has nothing to do with the script's own imports (whatever they are, or nothing at all) — it never gets that far.
+
+**Fix, and the rule going forward:** every job script gets its own PEP 723 header declaring exactly the dependencies it needs (an empty `dependencies = []` is fine for a stdlib-only script), and is invoked with `uv run --script <file>.py` — this resolves an isolated, ephemeral environment from the header alone, in **script mode**, which never walks upward for a project file at all. The team repo's own `bibi` dependency (and the private-remote auth it needs) never enters the picture:
 
 ```python
 #!/usr/bin/env -S uv run --script
@@ -186,7 +188,7 @@ On the host this is invisible — a developer's shell already has that remote au
 # ///
 ```
 
-A script that imports anything beyond the stdlib and lacks this header is a **latent container-mode failure waiting to happen**, even if it currently only ever runs in `exec_mode: host` — check for it the same way you'd check for the external-data convention above.
+**Any** `job:` that shells out to `uv run python` on a `.py` file lacking this header is a latent container-mode failure waiting to happen, even if it currently only ever runs in `exec_mode: host` and even if it imports nothing but the stdlib — check for it the same way you'd check for the external-data convention above.
 
 ## Slash commands
 
