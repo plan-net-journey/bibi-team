@@ -152,6 +152,24 @@ either `job:` (shell) or `claude:` (AI prompt) as its payload.
 
 **Memo files** carry **no required frontmatter** — they are plain documents.
 
+## External job data & secrets
+
+A scheduled job runs in a **fresh git worktree checked out from `trunk` on every fire** (`worktree.prepare()`) — anything gitignored *inside* that worktree, including `vault/case/*/data/` (the data-hygiene rule in `CLAUDE.md`), is wiped before the job even starts. A collector that must accumulate state across fires — a watermark, a growing NDJSON, cached API results — cannot live there; it needs a path outside any worktree entirely, on the host filesystem.
+
+Convention: two XDG-style roots under the job-owning host's real home directory, both overridable per script via an env var.
+
+| What | Default path | Override (example) |
+|---|---|---|
+| Secrets (OAuth tokens, API keys) | `~/.config/bibi-<name>/` | `BIBI_<NAME>_HOME` |
+| Data (growing/cached state) | `~/.local/share/bibi/<subsystem>/` | `BIBI_<SUBSYSTEM>_DATA` |
+
+`exec_mode: host` sees both paths directly — same OS user, real filesystem, nothing engine-specific needed. `exec_mode: container` needs help, and the two halves are solved differently:
+
+- **Data** is mounted generically: `exec_backend.build_exec()` (bibi engine) bind-mounts the whole `~/.local/share/bibi` root into every container job. No per-script or per-job config needed — any script following the convention above just works in either mode.
+- **Secrets are *not* mounted per-directory** (that would need one bind-mount per credential set); instead they ride the existing `BIBI_JOB_ENV_<NAME>` mechanism (`~/.config/bibi/env`, node config, see `INSTALL.md`) — every entry with that prefix is passed, prefix stripped, into **every** container job on the node. A script meant to work in both modes should read its secret from the matching env var first, falling back to the `~/.config/bibi-<name>/` file for interactive/host-only use.
+
+**Team-trust model:** `BIBI_JOB_ENV_*` is deliberately unscoped — every container job on a node sees every credential declared there, not just the ones it needs. This mirrors `exec_mode: host`, where every job already runs as the same OS user with full filesystem access (zero job-to-job isolation there either); the data mount and the env-var mechanism both just extend that same existing trust boundary to container mode rather than inventing a stricter one. Weigh this before wiring up a **write**-scoped credential this way — a read-only scope is lower-stakes than one that can mutate, and deserves a deliberate decision, not a reflexive copy-paste.
+
 ## Slash commands
 
 Thin wrappers around `bibi-ctrl`; installed under `.claude/skills/`.
