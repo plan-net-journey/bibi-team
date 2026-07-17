@@ -66,3 +66,6 @@ library:
     - name: job
       description: Scheduler-Jobs listen/inspizieren/killen/neustarten (via Daemon)
       source: https://github.com/plan-net-journey/bibi/blob/dev/skills/bibi-job/SKILL.md
+    - name: soul
+      description: Aktive Persona wechseln/anzeigen (.claude/souls/*.SOUL.md, team-eigen)
+      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/bibi-soul/SKILL.md
