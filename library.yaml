@@ -72,3 +72,6 @@ library:
     - name: job-create
       description: Interaktiver Wizard, um eine neue Schedule anzulegen
       source: https://github.com/plan-net-journey/bibi/blob/dev/skills/bibi-job-create/SKILL.md
+    - name: job-doctor
+      description: Konsistenz-Diagnose ueber bestehende bibi-ctrl-Befehle (rescan/mergeback/doctor/job list)
+      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/bibi-job-doctor/SKILL.md
