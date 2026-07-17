@@ -69,3 +69,6 @@ library:
     - name: soul
       description: Aktive Persona wechseln/anzeigen (.claude/souls/*.SOUL.md, team-eigen)
       source: https://github.com/plan-net-journey/bibi/blob/dev/skills/bibi-soul/SKILL.md
+    - name: job-create
+      description: Interaktiver Wizard, um eine neue Schedule anzulegen
+      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/bibi-job-create/SKILL.md
