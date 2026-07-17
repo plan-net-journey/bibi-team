@@ -34,13 +34,7 @@ flowing prose does not. This keeps diffs minimal (editing one clause doesn't
 re-flow the whole paragraph) and matches how the `==name:==`-annotation
 dialogues in this vault are written (e.g. `case/*/Routing-Analyse.md`).
 
-Never write a bare `<placeholder>`-style angle-bracket tag in flowing text —
-outside a fenced/inline code span, Obsidian's permissive inline-HTML parsing
-treats `<cutoff>` as an opening HTML tag it never finds a closing match for,
-and renders the rest of the block wrong. Wrap it in backticks (`` `<cutoff>` ``)
-or a fenced code block instead. This is unrelated to real HTML being invalid —
-a `<script>`-looking fragment is exactly as risky as an obviously-not-a-tag
-placeholder word; Obsidian does not distinguish the two.
+Never write a bare `<placeholder>`-style angle-bracket tag in flowing text — outside a fenced/inline code span, Obsidian's permissive inline-HTML parsing treats `<cutoff>` as an opening HTML tag it never finds a closing match for, and renders the rest of the block wrong. Wrap it in backticks (`` `<cutoff>` ``) or a fenced code block instead. This is unrelated to real HTML being invalid — a `<script>`-looking fragment is exactly as risky as an obviously-not-a-tag placeholder word; Obsidian does not distinguish the two.
 
 ## Top-level folders
 

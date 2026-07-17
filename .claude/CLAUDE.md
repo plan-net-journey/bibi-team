@@ -31,15 +31,7 @@ Top-Level-Ordner (`case`/`memo`/`etc`), Naming, Frontmatter und die Idee hinter
 diese Datei führen** — `bibi-ctrl doctor` meldet ihr Fehlen. Das maßgebliche
 Engine-Design liegt separat im Projekt-Vault (`DESIGN.md`).
 
-**Beim Schreiben/Editieren jeder `vault/`-Markdown-Datei aktiv gegen
-`CONVENTIONS.md` § „Markdown style" prüfen** — insbesondere: eine physische
-Zeile pro Absatz (nie bei ~80 Spalten hart umbrechen) und keine bloßen
-`<Platzhalter>`-artigen Winkelklammer-Tags außerhalb Code-Fences/Backticks
-(Obsidian interpretiert sie als offene, nie geschlossene HTML-Tags und
-rendert dann falsch — `` `<cutoff>` `` statt `<cutoff>` schreiben, oder in
-einen ```` ``` ````-Block). `bibi-ctrl doctor` prüft beides zusätzlich
-automatisiert — als Netz, nicht als Ersatz für die Selbstprüfung beim
-Schreiben selbst.
+**Beim Schreiben/Editieren jeder `vault/`-Markdown-Datei aktiv gegen `CONVENTIONS.md` § „Markdown style" prüfen** — insbesondere: eine physische Zeile pro Absatz (nie bei ~80 Spalten hart umbrechen) und keine bloßen `<Platzhalter>`-artigen Winkelklammer-Tags außerhalb Code-Fences/Backticks (Obsidian interpretiert sie als offene, nie geschlossene HTML-Tags und rendert dann falsch — `` `<cutoff>` `` statt `<cutoff>` schreiben, oder in einen ```` ``` ````-Block). `bibi-ctrl doctor` prüft beides zusätzlich automatisiert — als Netz, nicht als Ersatz für die Selbstprüfung beim Schreiben selbst.
 
 ### Daten-Hygiene im Vault (DESIGN §3.5)
 
