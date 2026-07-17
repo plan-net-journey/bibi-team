@@ -139,7 +139,7 @@ protocol: ./protocol.json    # optional: set by /protocol on
 schedule: "*/10 * * * *"     # cron | on_demand | never  (recurring)
 at: 2026-06-27T18:01:56      # ISO datetime (one-shot; mutually exclusive)
 job: node fetch.mjs          # shell command to run …
-claude: "summarize today"    # … OR an AI prompt (instead of job:)
+# job: "claude: summarize today"   # … OR an AI prompt, via the claude: prefix
 app_port: 9100               # optional: long-running app / HITL port
 exec_mode: container         # host | container
 attempts: 3                  # optional retry count
@@ -148,7 +148,9 @@ backoff: exponential         # optional retry strategy
 ```
 
 A schedule MD carries either `schedule:` (recurring) or `at:` (one-shot), and
-either `job:` (shell) or `claude:` (AI prompt) as its payload.
+exactly one `job:` key as its payload — a shell command, or an AI prompt via
+the `claude:` prefix inside that same value (`job: "claude: <prompt>"`), never
+a separate `claude:` key (Unified Job Model, one payload key only).
 
 **Memo files** carry **no required frontmatter** — they are plain documents.
 
