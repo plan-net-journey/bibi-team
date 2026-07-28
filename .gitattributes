@@ -6,6 +6,8 @@
 *.heic filter=lfs diff=lfs merge=lfs -text
 *.tiff filter=lfs diff=lfs merge=lfs -text
 *.webp filter=lfs diff=lfs merge=lfs -text
+*.xcf  filter=lfs diff=lfs merge=lfs -text
+*.svg  filter=lfs diff=lfs merge=lfs -text
 
 # audio / video
 *.mp4  filter=lfs diff=lfs merge=lfs -text

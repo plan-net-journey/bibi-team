@@ -8,6 +8,9 @@
 # Obsidian-Workspace/-Config des Vaults (user-/maschinenspezifisch) — nicht ins Team-Repo.
 vault/.obsidian/
 
+# Obsidian-Papierkorb — gelöschte Notizen, analog zum bibi-v3-Muster nicht ins Repo.
+vault/.trash/
+
 # Runtime-State: SQLite, Worktrees, Job-Logs (Verzeichnis bleibt via .gitkeep sichtbar)
 data/*
 !data/.gitkeep
@@ -25,8 +28,19 @@ vault/case/*/data/
 # library.yaml ist das Manifest; the-library ist nur für Install/Upgrade des
 # Maintainers. Andere Entwickler erhalten alle Skills via git clone.
 
+# Log-Dateien beliebiger Herkunft (z.B. Case-/Probe-Jobs) — nicht versioniert
+*.log
+
 # Python
 __pycache__/
 *.py[cod]
 .venv/
 *.egg-info/
+.DS_Store
+
+# Personalisierte Signatur-Instanz (bibi3-Muster übernommen) — nur das Template ist
+# committet, die ausgefüllte sign.md ist pro Nutzer/Knoten verschieden
+# (CONVENTIONS.md § „==name:== annotations and the signature file").
+vault/etc/templates/*
+!vault/etc/templates/*.template.md
+vault/etc/scratch/*

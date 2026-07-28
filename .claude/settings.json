@@ -1,4 +1,7 @@
 {
+  "worktree": {
+    "bgIsolation": "none"
+  },
   "statusLine": {
     "type": "command",
     "command": "bibi-ctrl statusline"

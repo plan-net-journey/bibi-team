@@ -11,10 +11,12 @@ den Engine-Code. Die Engine `bibi` ist als Abhängigkeit deklariert
   (Quelle: das `bibi`-Repo u. a.). Leer im Skelett.
 - `.claude/.state.md` — repo-globaler Laufzeit-State, **gitignored**. Nie direkt
   editieren — `bibi-ctrl` verwaltet ihn.
+- `.claude/settings.json` — team-weite Hooks, Statusleiste und `worktree.bgIsolation: "none"`. Letzteres ist bewusst gesetzt und gilt für **jede** Instanz, nicht nur für eine bestimmte: die Case-Workflows (`/open`/`/save`/`/sync`) leiten den aktiven Case aus cwd bzw. Park-Marke ab und schreiben in den geteilten, gitignoreten Laufzeit-State — ein isolierter `EnterWorktree`-Worktree hat beides nicht, der Case-Kontext ginge verloren.
 - `vault/case/` — Cases; einziger der Engine bekannte Vault-Ordner (Scheduler
   parst Schedule-/At-MDs darin). Name per `case_dir:` konfigurierbar.
 - `vault/case/<case>/data/` — **gesammelte/rohe Flat-File-Daten** (News, Kurse …),
   **gitignored** (siehe Daten-Hygiene unten).
+- `vault/memo/`, `vault/etc/` — reine Vault-Konventionen, von der Engine nie geparst (siehe `CONVENTIONS.md`). In `vault/etc/templates/` liegt das committete Signatur-Template; die daraus abgeleitete persönliche `sign.md` ist gitignored.
 - `data/` — Runtime-State (SQLite, Worktrees, Job-Logs), **gitignored**.
 
 ## Setup
