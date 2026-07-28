@@ -75,11 +75,17 @@ library:
     - name: job-doctor
       description: Konsistenz-Diagnose ueber bestehende bibi-ctrl-Befehle (rescan/mergeback/doctor/job list)
       source: https://github.com/plan-net-journey/bibi/blob/dev/skills/bibi-job-doctor/SKILL.md
-    # Gitea-URL, anders als die 14 Eintraege darueber: die Repos liegen auf
-    # sarasate/Gitea, GitHub ist im Projekt tabu. bibi-notes' eigene
-    # library.yaml steht bereits vollstaendig auf dieser Form — dass es hier
-    # noch nicht so ist, ist Blueprint-Drift und gehoert in den laufenden
-    # Abgleich, nicht in diesen Nachzieh-Commit.
+    # Gitea-URL, anders als die 14 Eintraege darueber. Hintergrund, damit das
+    # nicht wie ein Fluechtigkeitsfehler aussieht: die alten github.com-URLs
+    # sind eine BEWUSSTE Zurueckstellung (INSTALL.md, "Track C") — the-library
+    # parst bislang nur GitHub-Quell-URLs, `/library use|sync` funktioniert
+    # gegen Gitea also ohnehin nicht, weshalb die Umstellung als folgenlos
+    # zurueckgestellt wurde. bibi-notes hat seine eigene library.yaml
+    # inzwischen trotzdem vollstaendig auf Gitea gezogen (2026-07-24); dieser
+    # neue Eintrag folgt dem, weil die Repos dort liegen und GitHub im Projekt
+    # tabu ist. Die uebrigen 14 anzugleichen bleibt kosmetisch, solange
+    # Track C offen ist — ein Punkt fuer den Blueprint-Abgleich, kein
+    # Nebeneffekt dieses Commits.
     - name: bibi-setup
       description: Interviewgefuehrtes Node-Onboarding (init --non-interactive, Daemon-Start, Browser-Oeffnen)
       source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/bibi-setup/SKILL.md
