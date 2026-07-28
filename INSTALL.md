@@ -13,6 +13,10 @@ Skills sind committed — nach dem Clone sofort verfügbar, kein the-library nö
 - [`uv`](https://docs.astral.sh/uv/) installiert
 - `git` mit hinterlegten **Gitea-Credentials** (credential-helper: `store` auf
   Linux, Keychain auf macOS) — die Repos sind privat.
+- **`git-lfs` installiert** (Paket `git-lfs`) — der Vault führt Bilder/PDFs und
+  andere Binärdateien über LFS (`.gitattributes`, s. `.claude/CLAUDE.md`
+  § Daten-Hygiene). Ohne das Binär kommen sie als Pointer-Textdateien statt als
+  Inhalt an.
 
 ### Schritte
 
@@ -20,9 +24,17 @@ Skills sind committed — nach dem Clone sofort verfügbar, kein the-library nö
 dem Blueprint erzeugt (DESIGN §4.10 Schritt 0). `INSTANZ` = dein Repo-Name:
 
 ```bash
+git lfs install          # einmalig pro NUTZER, nicht pro Maschine
 git clone http://sarasate.tail9f9173.ts.net:3000/m.rau/INSTANZ.git
 cd INSTANZ
 ```
+
+`git lfs install` schreibt die LFS-Filter in die `~/.gitconfig` des **aktuellen
+Nutzers**. Ein frisch angelegter Account hat sie also nicht, auch wenn
+`git-lfs` systemweit installiert ist — dann landen alle LFS-Dateien als
+Pointer-Text im Checkout, und das fällt erst auf, wenn jemand ein Bild öffnet.
+Nachträglich heilen: `git lfs install && git lfs pull` (der Filter allein wirkt
+nur auf künftige Checkouts).
 
 **2. Engine installieren**
 
@@ -92,9 +104,14 @@ sudo chown "$(whoami):$(whoami)" /srv/bibi /srv/INSTANZ
 in Schritt 3 — `-e ../bibi` ist relativ):
 
 ```bash
+git lfs install          # als der Nutzer, dem die Checkouts gehören sollen
 git clone -b dev http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi.git /srv/bibi
 git clone -b trunk http://sarasate.tail9f9173.ts.net:3000/m.rau/INSTANZ.git /srv/INSTANZ
 ```
+
+Das `git lfs install` gilt pro Nutzer (s. Abschnitt oben) — auf einem Server
+mit eigenem Service-Account also erneut, auch wenn ein anderer Account auf
+derselben Maschine es längst hat.
 
 **3. venv + editierbares Install — mit `[daemon]`-Extra:**
 
@@ -112,25 +129,39 @@ uv pip install -e "../bibi[daemon]"
 **4. Knoten bootstrappen + Daemon installieren** — wie oben, Schritte 3+5
 (`bibi-ctrl init`, dann `bibi-ctrl daemon install`).
 
-> **Falle — editierbares Install ist fragil:** jeder `uv run bibi-ctrl …`-
-> Aufruf synct das venv gegen die in `pyproject.toml`/`uv.lock` deklarierte
-> Git-Abhängigkeit zurück — **auch der `ExecStart` der systemd/launchd-Unit
-> bei jedem Neustart.** Der editierbare Install gegen `/srv/bibi` wird dabei
-> durch einen regulären Install ersetzt — kein echtes „editable" mehr, sobald
-> der Daemon einmal neu gestartet hat. Für alle direkten CLI-Aufrufe daher
-> `.venv/bin/bibi-ctrl` verwenden, nicht `uv run bibi-ctrl` — Letzteres
-> reproduziert die Falle bei jedem Aufruf.
+> **Falle — jede lokale bibi-Installation ist fragil, editable oder nicht:**
+> jeder `uv run bibi-ctrl …`-Aufruf synct das venv gegen die in
+> `uv.lock` **eingefrorene** Git-Abhängigkeit zurück — **auch der
+> `ExecStart` der systemd/launchd-Unit bei jedem Neustart.** Der editierbare
+> Install gegen `/srv/bibi` wird dabei durch einen regulären Install
+> ersetzt — kein echtes „editable" mehr, sobald der Daemon einmal neu
+> gestartet hat. Für alle direkten CLI-Aufrufe daher `.venv/bin/bibi-ctrl`
+> verwenden, nicht `uv run bibi-ctrl` — Letzteres reproduziert die Falle bei
+> jedem Aufruf.
 >
 > **Korrektur (2026-07-05, empirisch widerlegt):** der Re-Sync installiert
 > **nicht** automatisch den aktuellen `origin/dev`-Commit, sondern exakt den in
 > `uv.lock` **eingefrorenen** Commit-Hash (`bibi.git?rev=dev#<sha>`) — `uv`
 > löst den Branch beim Lockfile-Erstellen einmalig auf ein festes SHA auf und
 > rührt es danach nicht mehr an. Ein Engine-Fix auf `dev` kommt also **nicht**
-> von selbst an, nur weil man den Daemon neu startet. Deploy-Reihenfolge für
-> einen Engine-Fix:
+> von selbst an, nur weil man den Daemon neu startet.
+>
+> **Zweite Korrektur (2026-07-22, `bibi-notes` live erlebt):** die Falle
+> betrifft nicht nur das editierbare `-e ../bibi`-Setup dieses Abschnitts,
+> sondern GENAUSO ein reguläres, nicht-editierbares Install direkt gegen die
+> Git-URL (`uv pip install "bibi[daemon] @ git+…@dev"`, das Entwickler-Setup
+> oben oder ein manueller Ad-hoc-Deploy) — der Re-Sync-Mechanismus fragt
+> nicht danach, WIE die vorherige Installation zustande kam, nur ob `uv.lock`
+> zufrieden ist. Auch `--reinstall`, `--no-cache` und sogar ein explizites
+> `uv pip uninstall` davor halfen dabei **nicht** — der nächste `uv run`
+> setzt die venv trotzdem auf den in `uv.lock` eingefrorenen Commit zurück,
+> weil das Lockfile selbst unverändert blieb. Deploy-Reihenfolge für einen
+> Engine-Fix, unabhängig vom Install-Modus:
 > 1. Fix in `bibi` auf `dev` committen + pushen.
 > 2. Im Instanz-Repo (`bibi-notes`/`INSTANZ`) `uv lock --upgrade-package bibi`
->    ausführen — hebt den gepinnten Commit im `uv.lock` an.
+>    ausführen — hebt den gepinnten Commit im `uv.lock` an. Ein reines
+>    `uv pip install`/`uninstall` gegen die venv reicht nicht, das Lockfile
+>    selbst muss sich ändern.
 > 3. `uv.lock`-Änderung committen + pushen, dort ankommen lassen (Pull/Sync).
 > 4. Erst dann bringt ein Daemon-Neustart (`systemctl restart …`) den neuen
 >    Engine-Commit tatsächlich ins laufende venv.
