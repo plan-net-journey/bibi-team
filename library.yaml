@@ -75,3 +75,11 @@ library:
     - name: job-doctor
       description: Konsistenz-Diagnose ueber bestehende bibi-ctrl-Befehle (rescan/mergeback/doctor/job list)
       source: https://github.com/plan-net-journey/bibi/blob/dev/skills/bibi-job-doctor/SKILL.md
+    # Gitea-URL, anders als die 14 Eintraege darueber: die Repos liegen auf
+    # sarasate/Gitea, GitHub ist im Projekt tabu. bibi-notes' eigene
+    # library.yaml steht bereits vollstaendig auf dieser Form — dass es hier
+    # noch nicht so ist, ist Blueprint-Drift und gehoert in den laufenden
+    # Abgleich, nicht in diesen Nachzieh-Commit.
+    - name: bibi-setup
+      description: Interviewgefuehrtes Node-Onboarding (init --non-interactive, Daemon-Start, Browser-Oeffnen)
+      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/bibi-setup/SKILL.md
