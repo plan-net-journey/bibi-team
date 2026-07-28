@@ -16,3 +16,16 @@ dependencies = [
     # da uv run/uv sync das venv gegen genau diese Deklaration zurücksynct).
     "bibi[daemon] @ git+http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi.git@dev",
 ]
+
+# Ein Team-Repo ist ein reines Vault-/Config-Repo, kein eigenes Python-Paket —
+# setuptools' Flat-Layout-Autodiscovery findet sonst `data/`/`vault/` als
+# vermeintliche Top-Level-Pakete und bricht ab ("Multiple top-level packages
+# discovered in a flat-layout"). Explizit keine Pakete, reiner Dependency-
+# Träger für die `bibi`-Engine.
+#
+# NICHT entfernen: ohne diese zwei Zeilen scheitert `uv pip install .` —
+# Schritt 2 der INSTALL.md — in JEDEM frisch aus diesem Blueprint erzeugten
+# Repo, sobald `vault/` und `data/` existieren (also sofort). Am 2026-07-28
+# gegen genau diese Datei reproduziert, bevor der Fix hier landete.
+[tool.setuptools]
+packages = []
