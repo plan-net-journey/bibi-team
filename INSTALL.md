@@ -66,7 +66,16 @@ nie versioniert):
 | `BIBI_REMOTE` | `http://sarasate…:3000/m.rau/INSTANZ.git` | Git-Remote für Synchronizer |
 | `BIBI_STATUS_POLL_INTERVAL` | `30` | Poll-Intervall (Sekunden) der Feed-Status-Kacheln, Default 30 |
 
-**4. Verify**
+**4. Persönliche Signatur anlegen**
+
+```bash
+cp vault/etc/templates/sign.template.md vault/etc/templates/sign.md
+# darin `enter-your-name` durch den eigenen Namen ersetzen
+```
+
+Einmal pro Nutzer, nicht pro Maschine im Team: `sign.md` ist gitignored (jeder Nutzer/Knoten hat eine eigene), committet ist nur das Template. Der Schnipsel liefert die `==name:==`-Marke, mit der Anmerkungen inline in Vault-Dokumenten signiert werden — siehe [`vault/CONVENTIONS.md`](vault/CONVENTIONS.md) § „`==name:==` annotations and the signature file".
+
+**5. Verify**
 
 ```bash
 bibi-ctrl status
@@ -75,7 +84,7 @@ bibi-ctrl status
 Starte Claude Code im Repo-Verzeichnis — `/open`, `/save` etc. erscheinen
 als Befehle (Skills sind in `.claude/skills/` committed).
 
-**5. (Optional) Daemon-Rollen installieren**
+**6. (Optional) Daemon-Rollen installieren**
 
 ```bash
 bibi-ctrl daemon install
