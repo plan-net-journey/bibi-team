@@ -16,6 +16,35 @@
 #   Upgrade:  /library sync          (alle installierten Skills aktualisieren)
 #   Prüfen:   git diff .claude/skills/
 #   Committen: git add .claude/skills/ && git commit -m "upgrade: bibi skills <version>"
+#
+# Beim Prüfen: die Quelle gegen die Engine datieren, nicht gegen sich selbst.
+# "Byte-identisch zur kanonischen Quelle" ist nur so viel wert, wie die Quelle
+# aktuell ist — hinkt sie einer Verhaltensänderung hinterher, zieht ein Sync
+# den veralteten Stand hierher und macht ihn zum gültigen. Bei einem Skill, der
+# sich auffällig ändert oder auffällig *nicht* ändert:
+#   git -C <bibi> log -1 --date=short --format=%ad -- skills/<quelle>/SKILL.md
+# gegen das Datum der letzten Verhaltensänderung am zugehörigen Kommando halten.
+# Weicht das ab, erst die Quelle reparieren, dann vendoren.
+#
+# Präzedenzfall: PLAN-38 stellte /run am 27.07.2026 auf in-place um, ließ aber
+# skills/bibi-run/SKILL.md auf dem Stand vom 24.07. Der Backport 4932b6b holte
+# damit die abgeschaffte Worktree-Isolation in diesen Blueprint zurück
+# (repariert: bibi f500543, bibi-team 56372fe). Dieselbe Regel steht als
+# Gegenstück im README der Engine — dort als Pflicht des Autors, den
+# SKILL.md-Text im selben Commit mitzuziehen.
+#
+# HOST-ADRESSE IST INSTANZSPEZIFISCH: die `source:`-URLs unten zeigen auf den
+# Gitea-Host dieser Instanz (Tailscale-intern, von außen nicht erreichbar). Ein
+# neues Team, das aus diesem Blueprint entsteht, ersetzt Host und Namespace
+# durch seine eigenen — der Rest des Pfads (/src/branch/dev/skills/…) bleibt.
+# GitHub ist im Projekt tabu, deshalb steht hier keine öffentliche URL als
+# vermeintlich neutraler Default.
+#
+# Track C: `/library use|sync` parst bislang nur GitHub-Quell-URLs und
+# funktioniert gegen Gitea ohnehin nicht. Die URLs unten sind damit reine
+# Dokumentation, kein funktionierender Bezugsweg — Skills werden zurzeit von
+# Hand vendort. Solange das so ist, ist ihre Form folgenlos; sie stimmt
+# trotzdem, damit sie nicht später als Flüchtigkeitsfehler gelesen wird.
 
 default_dirs:
   skills:
@@ -32,60 +61,49 @@ library:
   skills:
     - name: open
       description: Case öffnen oder reaktivieren (Substring-Match)
-      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/case-open/SKILL.md
+      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/case-open/SKILL.md
     - name: save
       description: Status committen und pushen
-      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/case-save/SKILL.md
+      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/case-save/SKILL.md
       requires: [skill:sync]
     - name: close
       description: Case pausieren
-      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/case-close/SKILL.md
+      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/case-close/SKILL.md
       requires: [skill:save]
     - name: done
       description: Case abschliessen (final)
-      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/case-done/SKILL.md
+      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/case-done/SKILL.md
       requires: [skill:save]
     - name: delete
       description: Case unwiderruflich löschen
-      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/case-delete/SKILL.md
+      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/case-delete/SKILL.md
     - name: protocol
       description: Per-Turn-Logging ein-/ausschalten
-      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/case-protocol/SKILL.md
+      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/case-protocol/SKILL.md
     - name: sync
       description: Repo manuell synchronisieren oder auto_sync konfigurieren
-      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/bibi-sync/SKILL.md
+      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/bibi-sync/SKILL.md
     - name: state
       description: Aktuellen bibi-Zustand anzeigen (Read-only)
-      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/bibi-state/SKILL.md
+      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/bibi-state/SKILL.md
     - name: at
       description: One-shot-Schedule anlegen (läuft einmal zur gegebenen Zeit)
-      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/bibi-at/SKILL.md
+      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/bibi-at/SKILL.md
     - name: run
       description: Job sofort lokal ausführen (umgeht den Scheduler, rein lokal)
-      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/bibi-run/SKILL.md
+      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/bibi-run/SKILL.md
     - name: job
       description: Scheduler-Jobs listen/inspizieren/killen/neustarten (via Daemon)
-      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/bibi-job/SKILL.md
+      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/bibi-job/SKILL.md
     - name: soul
       description: Aktive Persona wechseln/anzeigen (.claude/souls/*.SOUL.md, team-eigen)
-      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/bibi-soul/SKILL.md
+      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/bibi-soul/SKILL.md
     - name: job-create
       description: Interaktiver Wizard, um eine neue Schedule anzulegen
-      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/bibi-job-create/SKILL.md
+      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/bibi-job-create/SKILL.md
     - name: job-doctor
       description: Konsistenz-Diagnose ueber bestehende bibi-ctrl-Befehle (rescan/mergeback/doctor/job list)
-      source: https://github.com/plan-net-journey/bibi/blob/dev/skills/bibi-job-doctor/SKILL.md
-    # Gitea-URL, anders als die 14 Eintraege darueber. Hintergrund, damit das
-    # nicht wie ein Fluechtigkeitsfehler aussieht: die alten github.com-URLs
-    # sind eine BEWUSSTE Zurueckstellung (INSTALL.md, "Track C") — the-library
-    # parst bislang nur GitHub-Quell-URLs, `/library use|sync` funktioniert
-    # gegen Gitea also ohnehin nicht, weshalb die Umstellung als folgenlos
-    # zurueckgestellt wurde. bibi-notes hat seine eigene library.yaml
-    # inzwischen trotzdem vollstaendig auf Gitea gezogen (2026-07-24); dieser
-    # neue Eintrag folgt dem, weil die Repos dort liegen und GitHub im Projekt
-    # tabu ist. Die uebrigen 14 anzugleichen bleibt kosmetisch, solange
-    # Track C offen ist — ein Punkt fuer den Blueprint-Abgleich, kein
-    # Nebeneffekt dieses Commits.
+      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/bibi-job-doctor/SKILL.md
     - name: bibi-setup
       description: Interviewgefuehrtes Node-Onboarding (init --non-interactive, Daemon-Start, Browser-Oeffnen)
       source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/bibi-setup/SKILL.md
