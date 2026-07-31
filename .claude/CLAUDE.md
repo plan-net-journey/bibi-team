@@ -1,9 +1,6 @@
 # Claude Code — bibi-team
 
-Dies ist ein **Team-Repo** der bibi-Engine: es enthält die Team-Daten (`vault/`)
-und die installierten `.claude`-Bausteine (Skills, Agents, Commands) — **nicht**
-den Engine-Code. Die Engine `bibi` ist als Abhängigkeit deklariert
-(`pyproject.toml`) und stellt `bibi-ctrl` bereit.
+**Was dieses Repo ist, steht in [`README.md`](../README.md)** — die drei Nutzungsstufen, Host und Client, job/app/claude, das Verhältnis der drei Repos zueinander. Hier steht nur, was beim Arbeiten *in* diesem Repo zusätzlich gilt: Ablage, Konventionen, Zugänge. **Ein Einstiegspunkt, nicht zwei Wahrheiten** — was dort erklärt ist, wird hier nicht wiederholt, damit beide nicht auseinanderlaufen können. Das Gegenstück zur Job-Referenz ist [`JOBS.md`](../JOBS.md).
 
 ## Struktur (DESIGN §3.2)
 

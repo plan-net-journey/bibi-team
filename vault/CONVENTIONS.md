@@ -66,6 +66,21 @@ Rule of thumb: if it needs more than one file, it is a case; if it is one finish
 - **Memo file:** same scheme as a case folder, but for one file and without the `-<short>` suffix: `YYYYmmdd.<Topic>.md` (date + theme) or `YYYYmmdd.md` (date only); `<Topic>` is CamelCase. A periodic/running memo may use the month, `YYYYMM.<Topic>.md` (`202606.Billing.md`). No hash, no folder.
 - **No umlauts in paths:** `Ue` for `Ü`, `ae` for `ä`, `oe` for `ö`, `ss` for `ß`. Identifiers and folder slugs are ASCII.
 
+## Bugs and change requests belong in the issue tracker, not the vault
+
+A team that runs an issue tracker keeps **all** bug reports and change requests there — title, analysis, root cause, live findings, resolution. Do not open a bug dossier or a `Backlog.md` inside a case, and do not maintain a central bug list as a vault file: the tracker is the single source of truth for defects and requests, and a second copy in the vault will silently drift out of date. This repo's concrete tracker (URL, labels, templates) is named in `CLAUDE.md`, because it is instance-specific — the rule here is not.
+
+The split is by *kind of content*, not by importance. A **case** remains the right home for an activity that needs room: an investigation, a migration, a project with attachments, scripts and scheduled jobs. A **bug or CR** is a tracked item with a lifecycle someone else may query — it belongs where its state can be filtered, sorted and closed. When a tracked item grows into real work, open a case for the work and link the two: the issue references the case folder, and the case `README.md` carries the issue reference as a **link in its opening line**, directly below the heading — not as a frontmatter field. Write it in the cross-repo form (`owner/repo#42`), so the reference stays unambiguous when read from another repo, resolves as a link in both the tracker and the vault editor, and allows more than one issue without list syntax.
+
+This rule states where new material goes. Historical dossiers already archived inside a case are left where they are — moving finished history serves no one.
+
+## Naming convention
+
+- **Date:** always `YYYYmmdd` (8 digits, no separators).
+- **Case folder:** `YYYYmmdd.<slug>-<short>/` with `README.md` as the mandatory entry point. `<slug>` is CamelCase (non-alphanumerics stripped); `<short>` is the first 8 hex chars of a uuid4. Matched by `^\d{8}\.(.+)-([0-9a-f]{8})$`.
+- **Memo file:** same scheme as a case folder, but for one file and without the `-<short>` suffix: `YYYYmmdd.<Topic>.md` (date + theme) or `YYYYmmdd.md` (date only); `<Topic>` is CamelCase. A periodic/running memo may use the month, `YYYYMM.<Topic>.md` (`202606.Billing.md`). No hash, no folder.
+- **No umlauts in paths:** `Ue` for `Ü`, `ae` for `ä`, `oe` for `ö`, `ss` for `ß`. Identifiers and folder slugs are ASCII.
+
 ## Frontmatter schema
 
 **Case README** (`case/<folder>/README.md`):
@@ -88,7 +103,7 @@ protocol: ./protocol.json    # optional: set by /protocol on
 | `created` | ISO date of creation |
 | `protocol` | optional `./protocol.json` (or `+debug`); toggled via `/protocol` |
 
-**Schedule / job MD** (a flat MD inside a case dir, parsed by the scheduler):
+**Schedule / job MD** (a flat MD inside a case dir, parsed by the scheduler). **The block below is an excerpt, not the reference.** It shows the keys needed most often; the parser understands twenty, among them every timeout and retry knob that decides when a hanging job is declared a zombie or how long a deferred one may keep deferring. All of them, with defaults and failure modes, are in [`JOBS.md`](../JOBS.md) — documented once, so the two cannot drift apart:
 
 ```yaml
 ---
