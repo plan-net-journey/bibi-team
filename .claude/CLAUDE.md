@@ -55,6 +55,20 @@ Rollen-Zuordnung. Anders als `CONVENTIONS.md` ist das **kein generisches
 Muster**, sondern instanzspezifischer Live-Stand — die Datei hier ist nur ein
 Platzhalter-Template zum Ausfüllen, nicht der echte Stand irgendeines Teams.
 
+## Engine-Arbeit ist Test-zuerst
+
+**Test schreiben, fehlschlagen sehen, dann implementieren.** Der mittlere Schritt ist der, um den es geht: ein Test, der nie rot war, ist eine Behauptung und kein Nachweis — niemand weiß, ob er überhaupt greift. „Mit Test bauen" lässt offen, ob der Test vor oder nach dem Code entstand, und deckt damit auch den Fall ab, in dem er nur bestätigt, was ohnehin schon lief.
+
+Der Rot-Schritt gehört in den Nachweis, nicht bloß in die Absicht: **wenn ein Issue geschlossen wird, steht dort, wobei der Test fehlgeschlagen ist.** Ein Satz genügt.
+
+**Verbindlich ist die Regel für Engine-Verhalten** — alles, was der Daemon, der Worker, der Scheduler, die CLI oder eine Route tut. Dort ist ein roter Test billig zu bekommen und der einzige Beleg, dass die Ursache verstanden wurde und nicht nur das Symptom verschwunden ist.
+
+**Weicher für reine Darstellung im FE** — Kachel-Umbruch, CTA-Position, Sortierrichtung, Farbe. Dort gilt: Test vor dem Merge, nicht zwingend vor dem Code. Wer eine Kachel dreimal verschiebt, um zu sehen, wie sie wirkt, kann den Rot-Schritt nicht sinnvoll vorher setzen.
+
+**Diese Abstufung ist der Grund, warum die Regel hält.** Ohne sie wird sie bei der ersten Kachel gebrochen und ist danach überall verhandelbar — eine Regel, die einmal folgenlos gebrochen wurde, ist keine mehr. Die Grenze verläuft entlang der Frage „ändert sich Verhalten oder Aussehen", nicht entlang des Aufwands.
+
+**Warum das hier steht und nicht im Engine-Repo:** `bibi` wird immer aus einem realen Team-Repo heraus entwickelt. Wer an der Engine baut, sitzt in einer bibi-Sitzung eines Team-Repos, und dort wird diese Datei geladen. Das Engine-Repo hat kein `.claude/`-Verzeichnis und soll keins bekommen — es ist die Abhängigkeit, nicht der Arbeitsplatz. Der Preis dafür ist bekannt und in Kauf genommen: wer ein Terminal direkt mit `cwd=~/Project/bibi` öffnet, sieht die Regel nicht.
+
 ## Cross-Repo-Abstimmung
 
 Diese Team-Repo-Instanz, das `bibi-team`-Blueprint, aus dem sie hervorging,
