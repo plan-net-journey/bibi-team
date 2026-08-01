@@ -54,6 +54,38 @@ full of pointer files is worse than a failed setup because it looks fine.
 path — neither `INSTALL.md` nor this skill mentioned it — and had to be run
 by hand on the `mmu` test node.)
 
+
+### git-Identität
+
+Aus demselben Grund fehlt einem frischen Benutzer die **git-Identität**: ohne
+`user.name`/`user.email` rät git sie aus Benutzer- und Hostnamen zusammen und
+schreibt sie mit einer Warnung in jeden Commit — eine Warnung, die im Log eines
+Hintergrund-Jobs niemand liest. Im Team-Repo tragen Beiträge dann `mmu@sarasate`
+statt eines Namens, und wer das später gerade zieht, schreibt Historie um.
+
+Beim ersten fremden Knoten (2026-07) stand die Identität am Ende korrekt — aber
+**von Hand gesetzt**. Weder dieser Skill noch `bibi-ctrl init` kümmerten sich
+darum (`m.rau/bibi#18`). Deshalb hier, vor dem ersten Commit:
+
+```bash
+git config user.name  >/dev/null 2>&1 || echo "user.name fehlt"
+git config user.email >/dev/null 2>&1 || echo "user.email fehlt"
+```
+
+Fehlt eines von beiden, **den Menschen fragen** statt zu raten — der Name
+erscheint im Nodes-Screen und in jedem Commit, und ein aus dem Systembenutzer
+abgeleiteter Wert ist genau das, was hier vermieden werden soll:
+
+```bash
+git config user.name "Vorname Nachname"
+git config user.email "adresse@example.org"
+```
+
+Repo-lokal, nicht `--global`: die Maschine kann mehrere Identitäten tragen, und
+diese hier gehört zu diesem Team-Repo. `bibi-ctrl doctor` meldet den Zustand
+seither als `git-identity`, falls er später wieder auseinanderfällt.
+
+
 ## 1. Resolve `bibi-ctrl`
 
 ```bash
