@@ -1,6 +1,6 @@
 [project]
 name = "bibi-team"
-version = "0.5.0"
+version = "0.5.1"
 description = "Team-Repo der bibi-Engine — deklariert bibi als Abhängigkeit"
 requires-python = ">=3.11"
 dependencies = [
