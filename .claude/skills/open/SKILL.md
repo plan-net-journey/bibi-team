@@ -42,8 +42,7 @@ the session restarts. `bibi-ctrl status` prints where the case is coming from
 4. **No match** ⇒ create: `vault/<case_dir>/YYYYmmdd.<slug>-<short>/` with
    `README.md` (frontmatter `status: open`).
 5. In all open/create cases the command prints a `cd:` line — **cd into it.** It
-   also writes the session's park marker and the `path:` mirror in `.state.md`
-   (the latter is only a fallback for contexts without a session id).
+   also writes the session's park marker — the only store for the active case.
 
 ## When
 
