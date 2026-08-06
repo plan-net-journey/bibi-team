@@ -37,12 +37,15 @@
 # Gegenstück im README der Engine — dort als Pflicht des Autors, den
 # SKILL.md-Text im selben Commit mitzuziehen.
 #
-# HOST-ADRESSE IST INSTANZSPEZIFISCH: die `source:`-URLs unten zeigen auf den
-# Gitea-Host dieser Instanz (Tailscale-intern, von außen nicht erreichbar). Ein
-# neues Team, das aus diesem Blueprint entsteht, ersetzt Host und Namespace
-# durch seine eigenen — der Rest des Pfads (/src/branch/dev/skills/…) bleibt.
-# GitHub ist im Projekt tabu, deshalb steht hier keine öffentliche URL als
-# vermeintlich neutraler Default.
+# QUELLE IST GITHUB, und das ist seit dem 2026-08-06 keine Ausnahme mehr,
+# sondern der Normalfall: `bibi` ist öffentlich, die `source:`-URLs unten zeigen
+# dorthin, und `/library use|sync` funktioniert damit ohne Credentials.
+#
+# Hier stand bis dahin das Gegenteil — „GitHub ist im Projekt tabu", dazu
+# Gitea-Pfade der Form /src/branch/dev/skills/…. Beides war an die Zeit
+# gebunden, in der die Engine auf einer Tailnet-internen Gitea lag. Ein Satz,
+# der eine überholte Lage als Regel formuliert, ist teurer als gar keiner: er
+# hält jemanden davon ab, das Richtige zu tun.
 #
 # Track C: `/library use|sync` parst bislang nur GitHub-Quell-URLs und
 # funktioniert gegen Gitea ohnehin nicht. Die URLs unten sind damit reine
