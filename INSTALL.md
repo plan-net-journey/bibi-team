@@ -52,6 +52,10 @@ uv pip install -e ../bibi   # editierbar gegen lokalen bibi-Klon
 
 **3. Knoten bootstrappen**
 
+> **Es gibt auch einen geführten Weg.** Der Skill `/bibi-setup` fragt dich durch das Setup, statt dich eine Anleitung abarbeiten zu lassen — er installiert, konfiguriert, startet den Daemon und öffnet die Oberfläche. Er liegt in `.claude/skills/bibi-setup/` und ist nach dem Klon sofort da.
+>
+> **Nur: er setzt einen Scheduler voraus** (`--connect`) und taugt deshalb heute nicht für ein Team ohne einen. Das ist erfasst (`m.rau/bibi#179`). Bis dahin ist der Weg unten der richtige.
+
 ```bash
 bibi-ctrl init
 ```
