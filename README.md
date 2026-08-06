@@ -37,8 +37,6 @@ Two kinds of machine, and for most teams that is the whole story:
 - **The scheduler** runs the jobs. Usually a server that stays on. A team has at most one.
 - **Everything else is a client.** Your laptop. It does not run the team's scheduled jobs — it writes the documents that define them, and watches what the scheduler is doing.
 
-*Scheduler*, not *host*: the word names what the machine **does**, and it is the same word the roles and the config use (`BIBI_SCHEDULER_URL`). "Host" was the older term here and meant two things at once — the machine, and the role it carries. One of them is enough.
-
 As a client you can work **git-only** — a clone, an editor, `git push`, and the scheduler picks your changes up on its next pull — or **inside the bibi environment**, with the engine installed and a daemon running: slash commands, background sync, the web UI, live job output, and `/run`. Both are normal. Only the scheduler needs the full setup.
 
 A team **with no scheduler at all** is a legitimate arrangement, not a broken one: `bibi-ctrl run` executes a job in-process on a client, with no daemon involved. What you give up is precisely two things — jobs firing on a schedule, and jobs being distributed across machines. Everything else works from the first day, which makes "clients only" a sound way to start and add a scheduler later.
