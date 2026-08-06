@@ -8,7 +8,7 @@
 # der Katalog-`name:` ist bare → installiert als .claude/skills/<name>/ → der
 # Slash-Befehl ist bare (/open, /save, /state …). Siehe DESIGN §3.6.
 #
-# Aktuell installiert von: plan-net-journey/bibi@v0.7.1 (master)
+# Aktuell installiert von: plan-net-journey/bibi@9060bad (dev) — bibi-setup: vier Knotenarten (#180), job-create: attempts-Fix (#70)
 #
 # URL-Form ungeprueft (2026-08-06): the-library parst GitHub-Quellen, die
 # genaue erwartete Form (blob/ vs. raw.githubusercontent.com) ist hier nicht
