@@ -56,13 +56,27 @@ uv pip install -e ../bibi   # editierbar gegen lokalen bibi-Klon
 bibi-ctrl init
 ```
 
+**Vorher die einzige Entscheidung, die dieser Schritt von dir verlangt: Was ist diese Maschine?**
+
+| | `BIBI_ROLE` eingeben | wann |
+|---|---|---|
+| **Client** ohne Scheduler | `synchronizer,controller` | es gibt (noch) keinen Server. Der Normalfall am Anfang. |
+| **Client** an einem Scheduler | `synchronizer,controller` + `--connect <url>` | ein Server läuft, du hängst dich an |
+| **Scheduler** | `scheduler,worker,synchronizer` | der Server selbst |
+
+**Zwei Dinge musst du dabei nicht abwägen.** `synchronizer` gehört auf **jeden** Knoten — ohne ihn gleicht sich das Repo nicht ab. Und `controller` ist auf einem Client **immer** dabei: er serviert die Oberfläche, und die ist der Weg, auf dem ein Mensch hier arbeitet. Auf dem Scheduler gehört er **nicht** hin — der ist Backend, und eine zweite Oberfläche wäre ein zweiter Ort, an dem man nachsieht.
+
+**Ohne Scheduler fehlt nichts als zwei Dinge:** zeitgesteuerte Jobs und die Verteilung über mehrere Rechner. Der Case-Zyklus, `bibi-ctrl run`, die Oberfläche und `doctor` laufen ab Tag 1. „Nur Clients" ist ein gültiger Aufbau, kein halber.
+
+**Nach der Scheduler-URL wird nur gefragt, wenn `connect` in den Rollen steht** — ohne Server bleibt das Feld leer, und das ist richtig so.
+
 Fragt interaktiv ab und schreibt `~/.config/bibi/env` (außerhalb des Repos,
 nie versioniert):
 
 | Parameter | Beispiel | Bedeutung |
 |---|---|---|
 | `BIBI_SCHEDULER_URL` | `http://<host>:8780` | wohin `--connect` zeigt (leer lassen, wenn es keinen Server gibt) |
-| `BIBI_ROLE` | `worker,synchronizer` | kombinierte Rollen dieses Knotens |
+| `BIBI_ROLE` | s. Tabelle oben | kombinierte Rollen dieses Knotens |
 | `BIBI_REMOTE` | `https://github.com/<org>/INSTANZ.git` | Git-Remote für Synchronizer |
 | `BIBI_STATUS_POLL_INTERVAL` | `30` | Poll-Intervall (Sekunden) der Feed-Status-Kacheln, Default 30 |
 
@@ -181,7 +195,7 @@ uv pip install -e "../bibi[daemon]"
 > Snap-`uv` vorhanden ist, zuerst nachinstallieren:
 > `curl -LsSf https://astral.sh/uv/install.sh | sh`.
 
-> **Nicht vergessen — `auto_sync on` setzen:** ein unbeaufsichtigter Host hat
+> **Nicht vergessen — `auto_sync on` setzen:** ein unbeaufsichtigter Scheduler hat
 > niemanden, der einem Push zustimmen könnte; bleibt `auto_sync` auf `off`
 > (Default), pusht der Synchronizer nie automatisch, während er weiterhin
 > unauffällig pullt. Lokale Job-Run-Commits (Collector-/Digest-Läufe,

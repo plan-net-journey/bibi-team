@@ -14,7 +14,7 @@ Nothing here is a database. A case is a folder, a job is a file, state is frontm
 
 ## What is in this repo
 
-Three places matter. [`vault/`](vault/) holds the documents and is the actual content. [`.claude/`](.claude/) holds the agent side: the vendored slash commands, the personas, and the rules the AI reads. `data/` is gitignored runtime state, as is `vault/case/*/data/` where collected data accumulates — neither ever belongs in a commit.
+Three places matter. [`vault/`](vault/) holds the documents and is the actual content. [`.claude/`](.claude/) holds the agent side: the vendored slash commands, the personas, and the rules the AI reads. `data/` is gitignored runtime state, as is `vault/case/**/data/` — the double star matters, because cases may be nested and a single star stops at the first level. Collected data accumulates there; neither ever belongs in a commit.
 
 The full layout is written down in [`.claude/CLAUDE.md`](.claude/CLAUDE.md) and, for the vault side, in [`vault/CONVENTIONS.md`](vault/CONVENTIONS.md#top-level-folders). It is not repeated here, so the two cannot drift apart.
 
@@ -30,22 +30,31 @@ Each level builds on the one above and none of them is required. Stopping after 
 
 **What the daemon adds is narrower than it sounds**, because "start the daemon and you get jobs" is wrong on most machines. The slash commands never need it. On a laptop it syncs in the background, serves the web UI, and executes nothing at all — the scheduled jobs run on the one machine that is set up to run them. Which machine that is, is the next section.
 
-## Host and client
+## Scheduler and client
 
 Two kinds of machine, and for most teams that is the whole story:
 
-- **A host** runs the jobs. Usually a server that stays on. A team has at most one.
-- **Everything else is a client.** Your laptop. It does not run the team's scheduled jobs — it writes the documents that define them, and watches what the host is doing.
+- **The scheduler** runs the jobs. Usually a server that stays on. A team has at most one.
+- **Everything else is a client.** Your laptop. It does not run the team's scheduled jobs — it writes the documents that define them, and watches what the scheduler is doing.
 
-As a client you can work **git-only** — a clone, an editor, `git push`, and the host picks your changes up on its next pull — or **inside the bibi environment**, with the engine installed and a daemon running: slash commands, background sync, the web UI, live job output, and `/run`. Both are normal. Only the host needs the full setup.
+*Scheduler*, not *host*: the word names what the machine **does**, and it is the same word the roles and the config use (`BIBI_SCHEDULER_URL`). "Host" was the older term here and meant two things at once — the machine, and the role it carries. One of them is enough.
 
-A team **with no host at all** is a legitimate arrangement, not a broken one: `bibi-ctrl run` executes a job in-process on a client, with no daemon and no scheduler involved. What you give up is precisely two things — jobs firing on a schedule, and jobs being distributed across machines. Everything else works from the first day, which makes "clients only" a sound way to start and add a host later.
+As a client you can work **git-only** — a clone, an editor, `git push`, and the scheduler picks your changes up on its next pull — or **inside the bibi environment**, with the engine installed and a daemon running: slash commands, background sync, the web UI, live job output, and `/run`. Both are normal. Only the scheduler needs the full setup.
 
-`/run` is client-only on purpose: it runs a job in place against your live checkout, which is handy on a laptop and unsafe on the host, where the synchronizer is pulling into that same checkout. On the host you use `bibi-ctrl job start` instead.
+A team **with no scheduler at all** is a legitimate arrangement, not a broken one: `bibi-ctrl run` executes a job in-process on a client, with no daemon involved. What you give up is precisely two things — jobs firing on a schedule, and jobs being distributed across machines. Everything else works from the first day, which makes "clients only" a sound way to start and add a scheduler later.
 
-Underneath, *host* and *client* are not types but combinations of five roles — `synchronizer`, `scheduler`, `worker`, `controller`, and the `connect` modifier — chosen per machine in `~/.config/bibi/env`, never in the repo. On a host the scheduler and the worker sit together, which is the normal arrangement; separating them across machines is supported but advanced. The values to set are in [`INSTALL.md`](INSTALL.md).
+`/run` is client-only on purpose: it runs a job in place against your live checkout, which is handy on a laptop and unsafe on the scheduler, where the synchronizer is pulling into that same checkout. On the scheduler you use `bibi-ctrl job start` instead.
 
-Credentials travel host → client on their own: anything named `BIBI_JOB_ENV_*` on the host rides the heartbeat out to every approved node, so a secret is declared once and never copied by hand. It is deliberately unscoped — every job on every approved node can read it — so weigh a write-scoped token against that before adding one. Details in [`vault/CONVENTIONS.md`](vault/CONVENTIONS.md).
+Underneath, both are combinations of roles — `synchronizer`, `scheduler`, `worker`, `controller`, and the `connect` modifier — set per machine in `~/.config/bibi/env`, never in the repo. Two of them are not really a choice: **every node is a synchronizer**, and `connect` simply follows from whether a scheduler exists. That leaves two fixed shapes:
+
+| | roles | why |
+|---|---|---|
+| **scheduler** | `scheduler,worker,synchronizer` | holds the job database and runs the jobs. **No `controller`** — it is a backend, and its web UI would be a second place to look. |
+| **client** | `synchronizer,controller` (`+ connect`) | **always** carries the `controller`: the UI is how a person works here. `connect` only if there is a scheduler to attach to. |
+
+Splitting scheduler and worker across machines is supported but advanced. The values to set are in [`INSTALL.md`](INSTALL.md).
+
+Credentials travel scheduler → client on their own: anything named `BIBI_JOB_ENV_*` on the scheduler rides the heartbeat out to every approved node, so a secret is declared once and never copied by hand. It is deliberately unscoped — every job on every approved node can read it — so weigh a write-scoped token against that before adding one. Details in [`vault/CONVENTIONS.md`](vault/CONVENTIONS.md).
 
 ## job, app, claude
 

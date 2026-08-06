@@ -19,7 +19,11 @@ data/*
 # in git: wachsende/rotierende Rohdaten würden die History unbeschränkt aufblähen
 # (DESIGN §3.5). Konvention: pro Case ein gitignorierter `data/`-Unterordner.
 # Committet werden nur Code, Config und verdichtete Ergebnisse. Prüfen: `bibi-ctrl doctor`.
-vault/case/*/data/
+# ** statt *: Cases duerfen verschachtelt sein (vault/case/<thema>/<case>/),
+# und ein einzelner Stern greift dort nicht mehr — die Sammeldaten eines
+# verschachtelten Case landeten sonst im Commit. In bibi-notes war das schon
+# repariert, im Blueprint nicht (gefunden 2026-08-06 von m.rau).
+vault/case/**/data/
 
 # Hinweis: ~/.config/bibi/env liegt AUSSERHALB des Repos (von `bibi-ctrl init`
 # erzeugt) und wird hier nur dokumentiert — siehe INSTALL.md.
