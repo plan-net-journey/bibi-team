@@ -4,12 +4,12 @@ version = "0.7.1"
 description = "Team-Repo der bibi-Engine — deklariert bibi als Abhängigkeit"
 requires-python = ">=3.11"
 dependencies = [
-    # Engine als Abhängigkeit (DESIGN §3.2). Privates Repo auf Gitea — Installation
-    # nutzt die im git-credential-helper hinterlegten Gitea-Credentials (store auf
-    # Linux, Keychain auf macOS). Für lokale Entwicklung stattdessen:
+    # Engine als Abhängigkeit (DESIGN §3.2). Das Engine-Repo ist seit dem
+    # 2026-08-06 öffentlich — die Installation braucht **keine Credentials**.
+    # Für lokale Engine-Entwicklung stattdessen:
     # uv pip install -e ../bibi  (siehe INSTALL.md).
-    # Branch @dev während der aktiven Entwicklung (Engine-Default ist master/
-    # Release; @trunk existiert nicht). Vor Release auf @master umstellen.
+    # Gepinnt auf einen **Tag**, nicht auf einen Branch: ein Branch wandert,
+    # ein Tag nicht — das ist es, was den Rückweg billig hält (m.rau/bibi#162).
     # [daemon]-Extra zwingend: bibi-ctrl daemon run braucht fastapi/uvicorn
     # (INSTALL.md-Falle: ohne Extra crash-loopt der Daemon mit
     # "ModuleNotFoundError: No module named 'uvicorn'" bei jedem Neustart,
