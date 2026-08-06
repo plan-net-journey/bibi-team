@@ -11,8 +11,7 @@ Skills sind committed — nach dem Clone sofort verfügbar, kein the-library nö
 ### Voraussetzungen
 
 - [`uv`](https://docs.astral.sh/uv/) installiert
-- `git` mit hinterlegten **Gitea-Credentials** (credential-helper: `store` auf
-  Linux, Keychain auf macOS) — die Repos sind privat.
+- `git` — **die Engine braucht keine Credentials.** `bibi` und `bibi-team` sind seit dem 2026-08-06 öffentlich auf GitHub; `uv pip install .` zieht die Engine ohne jede Anmeldung. Nur für den Klon des **Instanz-Repos** brauchst du Zugang, wenn es privat ist (credential-helper: `store` auf Linux, Keychain auf macOS). Bis zur Öffnung stand hier das Gegenteil.
 - **`git-lfs` installiert** (Paket `git-lfs`) — der Vault führt Bilder/PDFs und
   andere Binärdateien über LFS (`.gitattributes`, s. `.claude/CLAUDE.md`
   § Daten-Hygiene). Ohne das Binär kommen sie als Pointer-Textdateien statt als
@@ -36,6 +35,13 @@ Pointer-Text im Checkout, und das fällt erst auf, wenn jemand ein Bild öffnet.
 Nachträglich heilen: `git lfs install && git lfs pull` (der Filter allein wirkt
 nur auf künftige Checkouts).
 
+**Jetzt gleich: die geerbte `LICENSE` (`m.rau/bibi#178`).** Das Template kopiert den gesamten Dateibestand, also auch die MIT-Lizenz des Blueprints. Der Blueprint **braucht** sie — ein öffentliches Repo ohne Lizenz ist „alle Rechte vorbehalten" und dürfte gar nicht als Vorlage benutzt werden. **Deine Instanz erbt damit eine Aussage, die für sie meist nicht stimmt.**
+
+- **Privates Repo?** Dann `LICENSE` löschen — sie stammt aus dem Blueprint und gilt für ihn, nicht für dich. Eine MIT-Datei auf einem Repo mit Kundeninhalten sagt, jeder dürfe sie verwenden, verändern und weitergeben. Das ist keine Formalie, sondern eine Falschaussage über die Rechtelage — und sie steht dort unbemerkt, weil niemand eine Datei liest, die von selbst erschienen ist.
+- **Öffentliches Team-Repo?** Dann braucht es eine **eigene** Lizenzentscheidung statt der geerbten.
+
+`/bibi-setup` fragt in Schritt 0b von selbst danach. Wer diese Anleitung von Hand abarbeitet, muss selbst daran denken — deshalb steht es hier und nicht weiter unten.
+
 **2. Engine installieren**
 
 ```bash
@@ -52,9 +58,23 @@ uv pip install -e ../bibi   # editierbar gegen lokalen bibi-Klon
 
 **3. Knoten bootstrappen**
 
-> **Es gibt auch einen geführten Weg.** Der Skill `/bibi-setup` fragt dich durch das Setup, statt dich eine Anleitung abarbeiten zu lassen — er installiert, konfiguriert, startet den Daemon und öffnet die Oberfläche. Er liegt in `.claude/skills/bibi-setup/` und ist nach dem Klon sofort da.
+> **Es gibt auch einen geführten Weg, und er ist inzwischen der bessere.** Der Skill `/bibi-setup` fragt dich durch das Setup, statt dich eine Anleitung abarbeiten zu lassen — er installiert, konfiguriert, bringt den richtigen Daemon hoch und öffnet die Oberfläche. Er liegt in `.claude/skills/bibi-setup/` und ist nach dem Klon sofort da.
 >
-> **Nur: er setzt einen Scheduler voraus** (`--connect`) und taugt deshalb heute nicht für ein Team ohne einen. Das ist erfasst (`m.rau/bibi#179`). Bis dahin ist der Weg unten der richtige.
+> Er kennt seit dem 2026-08-06 **alle vier Knotenarten** und fragt als erstes, welche diese Maschine ist (`m.rau/bibi#179`, `#180`). Vorher setzte er einen Scheduler voraus und installierte immer einen Dienst; beides ist weg. Alles, was unten steht, macht er selbst — diese Anleitung ist der Weg von Hand, nicht der Notweg.
+
+**Vorher prüfen, ob auf diesem Rechner schon ein bibi-Knoten wohnt (`m.rau/bibi#173`).** `bibi-ctrl init` schreibt `~/.config/bibi/env` und legt **kein Backup** an. Ein zweites `init` auf derselben Maschine zerstört die Konfiguration der ersten Instanz: `BIBI_NODE_ID` (der Knoten verliert seine Identität und seine Freigabe am Scheduler), alle `BIBI_JOB_ENV_*`-Werte aus dem Verteilweg, gesetzte Poll-Intervalle, `BIBI_PUBLIC_HOST`.
+
+```bash
+test -f ~/.config/bibi/env && grep -oE '^[A-Za-z_][A-Za-z0-9_]*=' ~/.config/bibi/env | tr -d '='
+```
+
+Das zeigt die Variablennamen **ohne die Werte** — genug, um zu sehen, ob dort schon jemand wohnt, und unbedenklich in einem Terminal, dem jemand zusieht. Gehört der Eintrag zu einem anderen Checkout, gib dieser Instanz ihre eigene Datei und benutze sie für **jeden** `bibi-ctrl`-Aufruf:
+
+```bash
+export BIBI_CONFIG_PATH="$PWD/data/bibi-env"
+```
+
+`config.py` löst sie vor `XDG_CONFIG_HOME` auf. Der sarasate-Host und sein Client fahren seit dem 2026-07-11 genau so — die Fähigkeit ist erprobt, nur ihre Erwähnung fehlte hier. Zwei Anschlüsse, ohne die es nicht hält: **die Variable gehört auch in die systemd-/launchd-Unit** (Schritt 6), sonst liest der Daemon beim nächsten Start wieder die geteilte Datei; und **`BIBI_WORKER_NAME` gehört dazu**, sonst meldet sich die zweite Instanz unter `socket.gethostname()` an und kollidiert mit der ersten in der Team-Registry.
 
 ```bash
 bibi-ctrl init
@@ -62,13 +82,20 @@ bibi-ctrl init
 
 **Vorher die einzige Entscheidung, die dieser Schritt von dir verlangt: Was ist diese Maschine?**
 
-| | `BIBI_ROLE` eingeben | wann |
-|---|---|---|
-| **Client** ohne Scheduler | `synchronizer,controller` | es gibt (noch) keinen Server. Der Normalfall am Anfang. |
-| **Client** an einem Scheduler | `synchronizer,controller` + `--connect <url>` | ein Server läuft, du hängst dich an |
-| **Scheduler** | `scheduler,worker,synchronizer` | der Server selbst |
+**Es gibt genau vier Antworten** (`m.rau/bibi#174`), und der Rest folgt daraus:
 
-**Zwei Dinge musst du dabei nicht abwägen.** `synchronizer` gehört auf **jeden** Knoten — ohne ihn gleicht sich das Repo nicht ab. Und `controller` ist auf einem Client **immer** dabei: er serviert die Oberfläche, und die ist der Weg, auf dem ein Mensch hier arbeitet. Auf dem Scheduler gehört er **nicht** hin — der ist Backend, und eine zweite Oberfläche wäre ein zweiter Ort, an dem man nachsieht.
+| | `BIBI_ROLE` eingeben | Daemon | wann |
+|---|---|---|---|
+| **Client** ohne Scheduler | `synchronizer,controller` | Sitzungs-Daemon | es gibt (noch) keinen Server. Der Normalfall am Anfang. |
+| **Client** an einem Scheduler | `synchronizer,controller` + `--connect <url>` | Sitzungs-Daemon | ein Server läuft, du hängst dich an |
+| **Worker** | `synchronizer,worker` + `--connect <url>` | Dienst | reiner Ausführungsknoten, keine Oberfläche |
+| **Scheduler** (+ Worker) | `scheduler,synchronizer`, meist `+worker` | Dienst | der Server selbst |
+
+**Drei Dinge musst du dabei nicht abwägen.** `synchronizer` gehört auf **jeden** Knoten — ohne ihn gleicht sich das Repo nicht ab. `controller` ist auf einem Client **immer** dabei: er serviert die Oberfläche, und die ist der Weg, auf dem ein Mensch hier arbeitet; auf einem Worker gehört er nie hin. Und `connect` ist keine Vorliebe, sondern folgt aus der Frage, ob es einen Scheduler gibt — ein **Scheduler** darf es überhaupt nicht tragen, er ist das Verbindungsziel und verbindet sich nicht zu sich selbst (die Engine weist die Kombination ab).
+
+**Ein Worker ohne Scheduler ist kein Aufbau, sondern ein Fehler.** Er startet, meldet sich gesund und bekommt nie einen Auftrag. Wenn es keinen Scheduler gibt, ist die Antwort „Client", nicht „Worker".
+
+**Trägt der Scheduler eine Oberfläche?** Offene Frage, bewusst nicht vorentschieden. Ist er der **erste** Knoten des Teams, nimm `controller` dazu — sonst hat niemand etwas anzusehen, bis ein Client existiert. Gibt es schon einen Client, lass ihn weg: sarasate hat ihn am 2026-08-04 abgegeben, weil der Scheduler Backend sein soll und eine zweite Oberfläche ein zweiter Ort wäre, an dem man nachsieht.
 
 **Ohne Scheduler fehlt nichts als zwei Dinge:** zeitgesteuerte Jobs und die Verteilung über mehrere Rechner. Der Case-Zyklus, `bibi-ctrl run`, die Oberfläche und `doctor` laufen ab Tag 1. „Nur Clients" ist ein gültiger Aufbau, kein halber.
 
@@ -102,14 +129,21 @@ bibi-ctrl status
 Starte Claude Code im Repo-Verzeichnis — `/open`, `/save` etc. erscheinen
 als Befehle (Skills sind in `.claude/skills/` committed).
 
-**6. (Optional) Daemon-Rollen installieren**
+**6. Daemon — und hier hängt es an der Knotenart, nicht am Betriebssystem**
+
+**Client: du bist fertig, es gibt nichts zu installieren.** Der Daemon kommt mit der Sitzung: `bibi` startet ihn als eigenes Kind (`--session --port auto`) und beendet ihn mit der letzten Sitzung. Das ist Absicht — ein Arbeitsplatz-Daemon existiert, solange jemand arbeitet, und ein Dienst, der den Rechner überlebt, ist einer, den niemand bestellt hat (`m.rau/bibi#180`). Der Port ist dynamisch; lies ihn aus `bibi-ctrl status`, schreib ihn nirgends fest.
+
+**Starte einen `--session`-Daemon nicht von Hand aus einer normalen Shell.** Er meldet dann keine Sitzung an, der Aufräumer findet null und fährt ihn beim nächsten Durchlauf wieder herunter — das sieht aus wie ein Start, der still fehlgeschlagen ist. Nimm `bibi`.
+
+**Worker, Scheduler, Scheduler+Worker: hier gehört ein Dienst hin**, denn sie müssen da sein, wenn niemand zusieht.
 
 ```bash
-bibi-ctrl daemon install
+bibi-ctrl daemon install [--connect]
 ```
 
-Welche Rollen je Knotentyp sinnvoll sind, ergänzt das Team sobald die
-Laufzeit steht (spätere Phasen).
+`--connect` auf einem Worker, nie auf einem Scheduler. Läuft eine **zweite Instanz** auf derselben Maschine (Schritt 3), trag `BIBI_CONFIG_PATH` und `BIBI_WORKER_NAME` von Hand in die geschriebene Unit nach — `daemon install` nimmt sie nicht mit, und ohne sie liest der Daemon beim nächsten Start wieder die geteilte Konfiguration.
+
+Steht auf einem **Client** schon eine Unit, weil sie aus einer früheren Anleitung stammt: `bibi-ctrl daemon uninstall`.
 
 ---
 
@@ -314,6 +348,18 @@ Nach jedem Install/Upgrade den Kommentar in `library.yaml` aktualisieren:
 > `@master` heben.
 
 So ist immer nachvollziehbar, welche Engine-Version die vendored Skills lieferte.
+
+### Einen Skill reparieren: immer zuerst die Quelle
+
+**Ein Skill-Fix ist erst fertig, wenn er in `bibi/skills/<name>/SKILL.md` steht.** Die Datei unter `.claude/skills/` ist die Kopie. Wer nur sie repariert, hat den Fehler nicht behoben, sondern lokal überdeckt — und der nächste `/library sync` schreibt ihn zurück, ohne dass jemand hinsieht: der Sync hat ja nur „Quellstand hergestellt".
+
+Das ist kein hypothetisches Risiko. `m.rau/bibi#70` (`attempts:` falsch dokumentiert) wurde am 2026-08-01 in den Instanzen gefixt und geschlossen; die Quelle trug den Fehler bis zum 2026-08-06 weiter. Alle Instanzen standen damit *vor* der Quelle, und ein Sync hätte ein geschlossenes Ticket still wieder geöffnet.
+
+**Ein Skill-Fix braucht kein Release** — er kommt per git, nicht per `uv sync`. Aber er darf nur Kommandos nennen, die der **gepinnte** Engine-Tag schon kennt. Gegen den Tag prüfen, nicht gegen `dev`:
+
+```bash
+git -C ../bibi show v0.7.1:bibi/ctrl/daemon_cmd.py | grep -- '--session'
+```
 
 ---
 
