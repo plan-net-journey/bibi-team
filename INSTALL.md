@@ -25,7 +25,7 @@ dem Blueprint erzeugt (DESIGN §4.10 Schritt 0). `INSTANZ` = dein Repo-Name:
 
 ```bash
 git lfs install          # einmalig pro NUTZER, nicht pro Maschine
-git clone http://sarasate.tail9f9173.ts.net:3000/m.rau/INSTANZ.git
+git clone https://github.com/plan-net-journey/INSTANZ.git
 cd INSTANZ
 ```
 
@@ -61,9 +61,9 @@ nie versioniert):
 
 | Parameter | Beispiel | Bedeutung |
 |---|---|---|
-| `BIBI_SCHEDULER_URL` | `http://sarasate:8769` | wohin `--connect` zeigt |
+| `BIBI_SCHEDULER_URL` | `http://<host>:8780` | wohin `--connect` zeigt (leer lassen, wenn es keinen Server gibt) |
 | `BIBI_ROLE` | `worker,synchronizer` | kombinierte Rollen dieses Knotens |
-| `BIBI_REMOTE` | `http://sarasate…:3000/m.rau/INSTANZ.git` | Git-Remote für Synchronizer |
+| `BIBI_REMOTE` | `https://github.com/<org>/INSTANZ.git` | Git-Remote für Synchronizer |
 | `BIBI_STATUS_POLL_INTERVAL` | `30` | Poll-Intervall (Sekunden) der Feed-Status-Kacheln, Default 30 |
 
 **4. Persönliche Signatur anlegen**
@@ -95,12 +95,12 @@ Laufzeit steht (spätere Phasen).
 
 ---
 
-## Für Produktions-/Server-Deploy (z. B. sarasate)
+## Für Produktions-/Server-Deploy
 
 Abweichend vom Entwickler-Setup oben: Engine + Instanz als **eigene,
 separate Klone** unter `/srv/` (nicht `~/Project/`), Daemon läuft dauerhaft
-über systemd. Reales Vorbild: `bibi-notes` auf sarasate (2026-07-04,
-Details/Protokoll in dessen `vault/case/…/Migration.md`).
+über systemd. Das Verfahren ist im Betrieb erprobt; die Schritte unten stammen
+aus einem realen Server-Deploy, nicht aus der Theorie.
 
 **1. Verzeichnisse anlegen** (einmalig `sudo` für `/srv/`):
 
@@ -114,8 +114,8 @@ in Schritt 3 — `-e ../bibi` ist relativ):
 
 ```bash
 git lfs install          # als der Nutzer, dem die Checkouts gehören sollen
-git clone -b dev http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi.git /srv/bibi
-git clone -b trunk http://sarasate.tail9f9173.ts.net:3000/m.rau/INSTANZ.git /srv/INSTANZ
+git clone -b master https://github.com/plan-net-journey/bibi.git /srv/bibi
+git clone -b trunk https://github.com/plan-net-journey/INSTANZ.git /srv/INSTANZ
 ```
 
 Das `git lfs install` gilt pro Nutzer (s. Abschnitt oben) — auf einem Server
@@ -212,54 +212,34 @@ the-library           ← Werkzeug für Install/Upgrade (nur für Maintainer)
 The-library liest `library.yaml`, zieht Skill-Dateien aus dem Engine-Repo
 und legt sie in `.claude/skills/`. Der Maintainer prüft den Diff und committet.
 
-> **Noch offen (Track C):** the-library parst in `SKILL.md` bislang nur
-> **GitHub**-Quell-URLs und klont `github.com/…`. Damit `/library use|sync` gegen
-> Gitea funktioniert, müssen die „Source Format"-/„Source Parsing"-Regeln um das
-> Gitea-Schema erweitert werden (`…/m.rau/<repo>/raw/branch/<branch>/<pfad>`,
-> Klon-URL `…/m.rau/<repo>.git`) **oder** die Katalog-`source:` auf lokale Pfade
-> umgestellt werden. Bis dahin reicht das hier eingerichtete Vendoring (Skills
-> sind committed), `/library`-Upgrades sind erst nach Track C nutzbar.
+> **Bis zur Publikation stand hier Track C** — ein offener Punkt, weil
+> the-library nur **GitHub**-Quell-URLs parst und die Engine auf einer privaten
+> Gitea lag. Mit der Veröffentlichung von `bibi` auf GitHub ist er
+> **gegenstandslos**: die Quellen in `library.yaml` zeigen jetzt dorthin, und
+> `/library use|sync` funktioniert ohne Erweiterung.
 
 ### The-library einrichten (einmalig)
 
-**1. Privaten Mirror anlegen** — *kein* Fork: ein Fork des public
-`disler/the-library` wäre zwangsläufig public. Stattdessen ein eigenes privates
-**Gitea**-Repo, das den Upstream spiegelt (bereits angelegt als `m.rau/the-library`):
+Ein direkter Klon genügt. Der frühere Umweg über einen privaten Mirror hatte
+genau einen Grund — die Engine war privat und the-library kam nicht an sie
+heran. Der ist mit der Publikation weg.
 
 ```bash
-# Gitea-Repo anlegen (falls noch nicht vorhanden):
-curl -X POST -u USER:TOKEN -H 'Content-Type: application/json' \
-  -d '{"name":"the-library","private":true}' \
-  http://sarasate.tail9f9173.ts.net:3000/api/v1/user/repos
-# Upstream hineinspiegeln:
-git clone --bare https://github.com/disler/the-library.git /tmp/the-library.git
-git -C /tmp/the-library.git push --mirror http://sarasate.tail9f9173.ts.net:3000/m.rau/the-library.git
-rm -rf /tmp/the-library.git
+git clone https://github.com/disler/the-library ~/.claude/skills/library
 ```
 
-**2. In globales Skills-Verzeichnis klonen:**
+`/library` ist damit in jeder Claude-Code-Session global verfügbar.
 
-```bash
-git clone http://sarasate.tail9f9173.ts.net:3000/m.rau/the-library.git ~/.claude/skills/library
-```
-
-`/library` ist damit in jeder Claude-Code-Session global verfügbar. (Ein
-`upstream`-Remote auf das public `disler/the-library` für spätere Tool-Updates
-ist optional und der einzige verbleibende GitHub-Berührungspunkt.)
-
-**3. Repo-URL eintragen**
-
-In `~/.claude/skills/library/SKILL.md` den `## Variables`-Abschnitt anpassen:
+**Repo-URL eintragen:** in `~/.claude/skills/library/SKILL.md` den
+`## Variables`-Abschnitt anpassen:
 
 ```markdown
-- **LIBRARY_REPO_URL**: `http://sarasate.tail9f9173.ts.net:3000/m.rau/the-library`
+- **LIBRARY_REPO_URL**: `https://github.com/plan-net-journey/bibi`
 ```
 
 `LIBRARY_YAML_PATH` und `LIBRARY_SKILL_DIR` bleiben unverändert.
 
-**4. Verify**
-
-Neue Claude-Code-Session starten → `/library list` zeigt den leeren Katalog.
+**Verify:** neue Claude-Code-Session starten → `/library list` zeigt den Katalog.
 
 ### Skills installieren oder upgraden
 
@@ -275,9 +255,6 @@ Neue Claude-Code-Session starten → `/library list` zeigt den leeren Katalog.
 /library use sync
 /library use state
 ```
-
-> `m.rau/bibi` ist privat — the-library nutzt die im git-credential-helper
-> hinterlegten Gitea-Credentials (siehe Track-C-Hinweis oben).
 
 > **Naming (Option A):** Die Engine-Quellordner sind gruppiert (`skills/case-*`,
 > `skills/bibi-*`), der Katalog-`name:` ist aber **bare**. the-library installiert
@@ -311,7 +288,7 @@ git push origin trunk
 Nach jedem Install/Upgrade den Kommentar in `library.yaml` aktualisieren:
 
 ```yaml
-# Aktuell installiert von: m.rau/bibi@<commit> (dev)
+# Aktuell installiert von: plan-net-journey/bibi@<tag> (master)
 ```
 
 > Branch: vor dem Release wird auf `dev` entwickelt (gruppierte `skills/case-*`-

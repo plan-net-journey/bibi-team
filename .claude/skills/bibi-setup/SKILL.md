@@ -60,7 +60,7 @@ by hand on the `mmu` test node.)
 Aus demselben Grund fehlt einem frischen Benutzer die **git-Identität**: ohne
 `user.name`/`user.email` rät git sie aus Benutzer- und Hostnamen zusammen und
 schreibt sie mit einer Warnung in jeden Commit — eine Warnung, die im Log eines
-Hintergrund-Jobs niemand liest. Im Team-Repo tragen Beiträge dann `mmu@sarasate`
+Hintergrund-Jobs niemand liest. Im Team-Repo tragen Beiträge dann `benutzer@rechnername`
 statt eines Namens, und wer das später gerade zieht, schreibt Historie um.
 
 Beim ersten fremden Knoten (2026-07) stand die Identität am Ende korrekt — aber

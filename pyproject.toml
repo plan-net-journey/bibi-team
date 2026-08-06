@@ -14,7 +14,7 @@ dependencies = [
     # (INSTALL.md-Falle: ohne Extra crash-loopt der Daemon mit
     # "ModuleNotFoundError: No module named 'uvicorn'" bei jedem Neustart,
     # da uv run/uv sync das venv gegen genau diese Deklaration zurücksynct).
-    "bibi[daemon] @ git+http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi.git@dev",
+    "bibi[daemon] @ git+https://github.com/plan-net-journey/bibi.git@v0.7.1",
 ]
 
 # Ein Team-Repo ist ein reines Vault-/Config-Repo, kein eigenes Python-Paket —

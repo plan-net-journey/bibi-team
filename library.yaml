@@ -8,7 +8,11 @@
 # der Katalog-`name:` ist bare → installiert als .claude/skills/<name>/ → der
 # Slash-Befehl ist bare (/open, /save, /state …). Siehe DESIGN §3.6.
 #
-# Aktuell installiert von: plan-net-journey/bibi@7774b35 (dev) — +at/run/job, +job start (Scheduler-Abschluss)
+# Aktuell installiert von: plan-net-journey/bibi@v0.7.1 (master)
+#
+# URL-Form ungeprueft (2026-08-06): the-library parst GitHub-Quellen, die
+# genaue erwartete Form (blob/ vs. raw.githubusercontent.com) ist hier nicht
+# verifiziert worden — beim ersten `/library sync` gegenpruefen.
 # Upgrade: /library sync im Team-Repo → git diff prüfen → commit + push
 #
 # Workflow für Maintainer:
@@ -61,49 +65,49 @@ library:
   skills:
     - name: open
       description: Case öffnen oder reaktivieren (Substring-Match)
-      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/case-open/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/case-open/SKILL.md
     - name: save
       description: Status committen und pushen
-      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/case-save/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/case-save/SKILL.md
       requires: [skill:sync]
     - name: close
       description: Case pausieren
-      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/case-close/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/case-close/SKILL.md
       requires: [skill:save]
     - name: done
       description: Case abschliessen (final)
-      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/case-done/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/case-done/SKILL.md
       requires: [skill:save]
     - name: delete
       description: Case unwiderruflich löschen
-      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/case-delete/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/case-delete/SKILL.md
     - name: protocol
       description: Per-Turn-Logging ein-/ausschalten
-      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/case-protocol/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/case-protocol/SKILL.md
     - name: sync
       description: Repo manuell synchronisieren oder auto_sync konfigurieren
-      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/bibi-sync/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/bibi-sync/SKILL.md
     - name: state
       description: Aktuellen bibi-Zustand anzeigen (Read-only)
-      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/bibi-state/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/bibi-state/SKILL.md
     - name: at
       description: One-shot-Schedule anlegen (läuft einmal zur gegebenen Zeit)
-      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/bibi-at/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/bibi-at/SKILL.md
     - name: run
       description: Job sofort lokal ausführen (umgeht den Scheduler, rein lokal)
-      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/bibi-run/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/bibi-run/SKILL.md
     - name: job
       description: Scheduler-Jobs listen/inspizieren/killen/neustarten (via Daemon)
-      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/bibi-job/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/bibi-job/SKILL.md
     - name: soul
       description: Aktive Persona wechseln/anzeigen (.claude/souls/*.SOUL.md, team-eigen)
-      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/bibi-soul/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/bibi-soul/SKILL.md
     - name: job-create
       description: Interaktiver Wizard, um eine neue Schedule anzulegen
-      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/bibi-job-create/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/bibi-job-create/SKILL.md
     - name: job-doctor
       description: Konsistenz-Diagnose ueber bestehende bibi-ctrl-Befehle (rescan/mergeback/doctor/job list)
-      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/bibi-job-doctor/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/bibi-job-doctor/SKILL.md
     - name: bibi-setup
       description: Interviewgefuehrtes Node-Onboarding (init --non-interactive, Daemon-Start, Browser-Oeffnen)
-      source: http://sarasate.tail9f9173.ts.net:3000/m.rau/bibi/src/branch/dev/skills/bibi-setup/SKILL.md
+      source: https://github.com/plan-net-journey/bibi/blob/master/skills/bibi-setup/SKILL.md
