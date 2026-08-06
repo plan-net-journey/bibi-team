@@ -1,7 +1,7 @@
 ---
 name: job
-description: List, inspect, kill, or restart scheduler jobs via the local daemon. Wraps `bibi-ctrl job` (the `/-/job` + `/-/scheduler` endpoints).
-argument-hint: '[list | show <id> | kill <id> | restart <id> | rescan]'
+description: List, inspect, kill, or reset scheduler jobs via the local daemon. Wraps `bibi-ctrl job` (the `/-/job` + `/-/scheduler` endpoints).
+argument-hint: '[list | show <id> | start <id> | kill <id> | reset <id> | rescan]'
 allowed-tools:
   - Bash
 ---
@@ -18,7 +18,7 @@ bibi-ctrl job list [--status <s>]   # all jobs: slug, status, kind, id (+reason)
 bibi-ctrl job show <id>             # one job, full JSON (status + root cause)
 bibi-ctrl job start <id>            # run a PENDING job now, without waiting for its trigger
 bibi-ctrl job kill <id>             # stop a RUNNING job → killed (by_user, §5.6)
-bibi-ctrl job restart <id>          # reset a TERMINAL job → pending (re-scheduled)
+bibi-ctrl job reset <id>            # reset a TERMINAL job → pending (re-scheduled)
 bibi-ctrl job rescan                # re-scan the vault for new/removed schedule MDs
 ```
 
