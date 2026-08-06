@@ -27,7 +27,7 @@ The three control verbs map directly onto the lifecycle (DESIGN §5.6):
 - **start** — make a `pending` job due **now** (it fires on the next tick); only
   valid from `pending` (else 409).
 - **kill** — `running → killed`; only valid while the job runs (else 409).
-- **restart** — `<terminal> → pending` (a fresh re-enqueue); only valid from a
+- **reset** — `<terminal> → pending` (a fresh re-enqueue); only valid from a
   terminal state (complete/error/inactive/zombie/killed).
 
 > Recurring (`cron`) schedules re-arm themselves after each run, so their **live
