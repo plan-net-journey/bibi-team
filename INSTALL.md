@@ -80,26 +80,32 @@ export BIBI_CONFIG_PATH="$PWD/data/bibi-env"
 bibi-ctrl init
 ```
 
-**Vorher die einzige Entscheidung, die dieser Schritt von dir verlangt: Was ist diese Maschine?**
+**Er stellt dir genau eine Entscheidung: Was ist diese Maschine?** Und darauf gibt es **vier Antworten** (`m.rau/bibi#174`) — den Rest leitet er selbst ab:
 
-**Es gibt genau vier Antworten** (`m.rau/bibi#174`), und der Rest folgt daraus:
+| Antwort | wann | Daemon |
+|---|---|---|
+| `client` | ein Arbeitsplatz. Du arbeitest hier, du siehst die Oberfläche. **Der Normalfall am Anfang**, auch ganz ohne Server. | Sitzungs-Daemon |
+| `worker` | reiner Ausführungsknoten: nimmt Aufträge entgegen, zeigt nichts an | Dienst |
+| `scheduler` | der Server. Er hält die Job-Datenbank und die Uhr. | Dienst |
+| `scheduler+worker` | der Server, und er führt die Jobs selbst aus — die übliche Form für den **ersten** Server eines Teams | Dienst |
 
-| | `BIBI_ROLE` eingeben | Daemon | wann |
-|---|---|---|---|
-| **Client** ohne Scheduler | `synchronizer,controller` | Sitzungs-Daemon | es gibt (noch) keinen Server. Der Normalfall am Anfang. |
-| **Client** an einem Scheduler | `synchronizer,controller` + `--connect <url>` | Sitzungs-Daemon | ein Server läuft, du hängst dich an |
-| **Worker** | `synchronizer,worker` + `--connect <url>` | Dienst | reiner Ausführungsknoten, keine Oberfläche |
-| **Scheduler** (+ Worker) | `scheduler,synchronizer`, meist `+worker` | Dienst | der Server selbst |
+Dasselbe ohne Rückfrage, etwa in einem Skript:
 
-**Drei Dinge musst du dabei nicht abwägen.** `synchronizer` gehört auf **jeden** Knoten — ohne ihn gleicht sich das Repo nicht ab. `controller` ist auf einem Client **immer** dabei: er serviert die Oberfläche, und die ist der Weg, auf dem ein Mensch hier arbeitet; auf einem Worker gehört er nie hin. Und `connect` ist keine Vorliebe, sondern folgt aus der Frage, ob es einen Scheduler gibt — ein **Scheduler** darf es überhaupt nicht tragen, er ist das Verbindungsziel und verbindet sich nicht zu sich selbst (die Engine weist die Kombination ab).
+```bash
+bibi-ctrl init --non-interactive --profile client --scheduler-url http://<host>:8780
+```
 
-**Ein Worker ohne Scheduler ist kein Aufbau, sondern ein Fehler.** Er startet, meldet sich gesund und bekommt nie einen Auftrag. Wenn es keinen Scheduler gibt, ist die Antwort „Client", nicht „Worker".
+**Was du dabei nicht abwägen musst, weil es keine Wahl ist.** `synchronizer` gehört auf **jeden** Knoten — ohne ihn gleicht sich das Repo nicht ab, und der Daemon lehnt eine Rollenmenge ohne ihn seit `v0.7.2` ab (`m.rau/bibi#163`). `controller` — die Oberfläche — trägt ein Client immer, ein Worker nie. Und `connect` ist keine Vorliebe, sondern folgt aus der Frage, ob es einen Scheduler gibt: ein Scheduler darf es überhaupt nicht tragen, er ist das Verbindungsziel und verbindet sich nicht zu sich selbst.
 
-**Trägt der Scheduler eine Oberfläche?** Offene Frage, bewusst nicht vorentschieden. Ist er der **erste** Knoten des Teams, nimm `controller` dazu — sonst hat niemand etwas anzusehen, bis ein Client existiert. Gibt es schon einen Client, lass ihn weg: sarasate hat ihn am 2026-08-04 abgegeben, weil der Scheduler Backend sein soll und eine zweite Oberfläche ein zweiter Ort wäre, an dem man nachsieht.
+**Ein Worker ohne Scheduler ist kein Aufbau, sondern ein Fehler.** Er startet, meldet sich gesund und bekommt nie einen Auftrag. `init` lehnt das deshalb ab und sagt, warum. Wenn es keinen Scheduler gibt, ist die Antwort `client`, nicht `worker`.
+
+**Soll der Server eine Oberfläche zeigen?** Standardmäßig nicht — er ist Backend, und eine zweite Oberfläche wäre ein zweiter Ort, an dem man nachsieht (so hat sarasate es am 2026-08-04 entschieden). Ist er der **erste** Knoten deines Teams und es gibt noch keinen Client, hänge `--with-ui` an: sonst hat niemand etwas anzusehen.
 
 **Ohne Scheduler fehlt nichts als zwei Dinge:** zeitgesteuerte Jobs und die Verteilung über mehrere Rechner. Der Case-Zyklus, `bibi-ctrl run`, die Oberfläche und `doctor` laufen ab Tag 1. „Nur Clients" ist ein gültiger Aufbau, kein halber.
 
-**Nach der Scheduler-URL wird nur gefragt, wenn `connect` in den Rollen steht** — ohne Server bleibt das Feld leer, und das ist richtig so.
+**Nach der Scheduler-URL fragt er von selbst**, wenn deine Antwort einen Scheduler zulässt (`client`) oder verlangt (`worker`) — vorher entschied darüber das Wort `connect` in der Rollenliste, was niemand ahnen konnte.
+
+**Die Rollenliste gibt es weiterhin**, für den, der sie kennt: `--role synchronizer,controller` statt `--profile`, oder interaktiv als zweite zulässige Antwort auf dieselbe Frage. Sie ist nicht verschwunden, sie ist nur nicht mehr die erste Frage an einen neuen Menschen.
 
 Fragt interaktiv ab und schreibt `~/.config/bibi/env` (außerhalb des Repos,
 nie versioniert):
@@ -107,7 +113,7 @@ nie versioniert):
 | Parameter | Beispiel | Bedeutung |
 |---|---|---|
 | `BIBI_SCHEDULER_URL` | `http://<host>:8780` | wohin `--connect` zeigt (leer lassen, wenn es keinen Server gibt) |
-| `BIBI_ROLE` | s. Tabelle oben | kombinierte Rollen dieses Knotens |
+| `BIBI_ROLE` | `synchronizer,controller` | die Rollen dieses Knotens — **abgeleitet** aus deiner Antwort oben, nicht selbst einzutippen |
 | `BIBI_REMOTE` | `https://github.com/<org>/INSTANZ.git` | Git-Remote für Synchronizer |
 | `BIBI_STATUS_POLL_INTERVAL` | `30` | Poll-Intervall (Sekunden) der Feed-Status-Kacheln, Default 30 |
 
