@@ -310,3 +310,35 @@ Nach jedem Install/Upgrade den Kommentar in `library.yaml` aktualisieren:
 > `@master` heben.
 
 So ist immer nachvollziehbar, welche Engine-Version die vendored Skills lieferte.
+
+---
+
+## Diese Anleitung prüfen
+
+Sie veraltet leise. Wer sie geschrieben hat, liest über Lücken hinweg — er weiß ja, was gemeint ist. Deshalb: **einmal von vorn durchgehen, bevor ein neuer Mensch es tut.** In einem leeren Verzeichnis, mit einer Sitzung, die nichts über dieses Projekt weiß.
+
+Der Prompt dafür, zum Kopieren:
+
+```text
+Ich gehe die INSTALL.md eines bibi-Team-Repos von vorn durch und prüfe,
+ob sie für jemanden trägt, der das System nicht kennt.
+
+Begleite mich Schritt für Schritt: sag mir, was ich eingeben soll und was
+ich danach sehen müsste, und frag dann, was ich tatsächlich gesehen habe.
+
+Zwei Regeln:
+1. Repariere nichts. Was hakt, kommt in befunde.md, dann gehen wir weiter.
+   Wer unterwegs repariert, weiß am Ende nicht mehr, wo es gehakt hat.
+2. Frag mich bei jedem Schritt: "Hätte ein Fremder das gewusst?" Ich neige
+   dazu, Lücken zu überlesen, weil ich das System kenne.
+
+Läuft auf dieser Maschine schon eine bibi-Instanz? Dann halte mich auf,
+bevor ich `bibi-ctrl init` ohne BIBI_CONFIG_PATH ausführe — es überschreibt
+sonst deren Konfiguration ohne Backup.
+
+Am Ende: sortiere die Befunde danach, wem sie gehören — dem Blueprint, der
+Engine oder dieser Instanz. Im Zweifel Blueprint: ein Fehler dort trifft
+jedes künftige Team.
+```
+
+**Was der Prompt bewusst nicht enthält:** die Liste dessen, was gerade schon bekannt ist. Die steht im Issue-Board und veraltet dort, wo sie hingehört — in einem Prompt würde sie mitaltern und irgendwann Befunde unterdrücken, die längst wieder neu sind.
