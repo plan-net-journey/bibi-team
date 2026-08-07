@@ -10,9 +10,12 @@
 #
 # Aktuell installiert von: plan-net-journey/bibi@9060bad (dev) — bibi-setup: vier Knotenarten (#180), job-create: attempts-Fix (#70)
 #
-# URL-Form ungeprueft (2026-08-06): the-library parst GitHub-Quellen, die
-# genaue erwartete Form (blob/ vs. raw.githubusercontent.com) ist hier nicht
-# verifiziert worden — beim ersten `/library sync` gegenpruefen.
+# URL-Form geprueft (2026-08-07): die `blob/`-Form stimmt. the-library
+# **parst** sie, ruft sie nicht ab (`SKILL.md` § „GitHub browser URLs" ->
+# `Clone URL: https://github.com/<org>/<repo>.git`) — das Repo wird geklont und
+# die Datei daraus gelesen. Dass ein `curl` darauf HTML liefert, spielt deshalb
+# keine Rolle; `raw.githubusercontent.com` waere gleichwertig, nicht richtiger.
+# Damit ist der Vorbehalt vom 2026-08-06 erledigt.
 # Upgrade: /library sync im Team-Repo → git diff prüfen → commit + push
 #
 # Workflow für Maintainer:
