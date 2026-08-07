@@ -43,7 +43,7 @@ A team **with no scheduler at all** is a legitimate arrangement, not a broken on
 
 `/run` is client-only on purpose: it runs a job in place against your live checkout, which is handy on a laptop and unsafe on the scheduler, where the synchronizer is pulling into that same checkout. On the scheduler you use `bibi-ctrl job start` instead.
 
-Underneath, both are combinations of roles — `synchronizer`, `scheduler`, `worker`, `controller`, and the `connect` modifier — set per machine in `~/.config/bibi/env`, never in the repo. Two of them are not really a choice: **every node is a synchronizer**, and `connect` simply follows from whether a scheduler exists. That leaves two fixed shapes:
+Underneath, both are combinations of roles — `synchronizer`, `scheduler`, `worker`, `controller`, and the `connect` modifier — set per machine in `<repo>/data/env` — inside the repo directory but never versioned, `data/` is gitignored. Two of them are not really a choice: **every node is a synchronizer**, and `connect` simply follows from whether a scheduler exists. That leaves two fixed shapes:
 
 | | roles | why |
 |---|---|---|

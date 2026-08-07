@@ -62,10 +62,15 @@ uv pip install -e ../bibi   # editierbar gegen lokalen bibi-Klon
 >
 > Er kennt seit dem 2026-08-06 **alle vier Knotenarten** und fragt als erstes, welche diese Maschine ist (`m.rau/bibi#179`, `#180`). Vorher setzte er einen Scheduler voraus und installierte immer einen Dienst; beides ist weg. Alles, was unten steht, macht er selbst — diese Anleitung ist der Weg von Hand, nicht der Notweg.
 
-**Vorher prüfen, ob auf diesem Rechner schon ein bibi-Knoten wohnt (`m.rau/bibi#173`).** `bibi-ctrl init` schreibt `~/.config/bibi/env` und legt **kein Backup** an. Ein zweites `init` auf derselben Maschine zerstört die Konfiguration der ersten Instanz: `BIBI_NODE_ID` (der Knoten verliert seine Identität und seine Freigabe am Scheduler), alle `BIBI_JOB_ENV_*`-Werte aus dem Verteilweg, gesetzte Poll-Intervalle, `BIBI_PUBLIC_HOST`.
+**Eine zweite Instanz auf demselben Rechner braucht seit `v0.7.3` keine Vorsichtsmaßnahme mehr** ([`#52`](https://github.com/plan-net-journey/bibi/issues/52)). `bibi-ctrl init` schreibt `<repo>/data/env` — zwei Instanzen sind zwei Repos und zwei Dateien, die einander nicht sehen können.
+
+Hier stand bis zum 2026-08-07 die Warnung, `init` schreibe `~/.config/bibi/env` und lege **kein Backup** an, ein zweites `init` zerstöre deshalb die Identität der ersten Instanz. Das war richtig und ist mit `#52` gegenstandslos geworden: die Datei wird nicht mehr gelesen und nicht mehr geschrieben. **`~/.config/bibi/env` ist damit reine Sicherung — nicht löschen**, sie trägt womöglich die einzige Kopie eines Credentials.
+
+Welchen Pfad diese Installation wirklich benutzt, sagt die Engine selbst:
 
 ```bash
-test -f ~/.config/bibi/env && grep -oE '^[A-Za-z_][A-Za-z0-9_]*=' ~/.config/bibi/env | tr -d '='
+python -c "import bibi.config as c; print(c.env_path())"
+test -f data/env && grep -oE '^[A-Za-z_][A-Za-z0-9_]*=' data/env | tr -d '='
 ```
 
 Das zeigt die Variablennamen **ohne die Werte** — genug, um zu sehen, ob dort schon jemand wohnt, und unbedenklich in einem Terminal, dem jemand zusieht. Gehört der Eintrag zu einem anderen Checkout, gib dieser Instanz ihre eigene Datei und benutze sie für **jeden** `bibi-ctrl`-Aufruf:
@@ -107,8 +112,8 @@ bibi-ctrl init --non-interactive --profile client --scheduler-url http://<host>:
 
 **Die Rollenliste gibt es weiterhin**, für den, der sie kennt: `--role synchronizer,controller` statt `--profile`, oder interaktiv als zweite zulässige Antwort auf dieselbe Frage. Sie ist nicht verschwunden, sie ist nur nicht mehr die erste Frage an einen neuen Menschen.
 
-Fragt interaktiv ab und schreibt `~/.config/bibi/env` (außerhalb des Repos,
-nie versioniert):
+Fragt interaktiv ab und schreibt `<repo>/data/env` (im Repo-Verzeichnis, aber
+nie versioniert — `data/` ist gitignored):
 
 | Parameter | Beispiel | Bedeutung |
 |---|---|---|
