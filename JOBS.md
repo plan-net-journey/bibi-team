@@ -160,6 +160,10 @@ Every key the parser reads. Anything not listed here is ignored, so you can keep
 | `defer_max` | int (s) | `1200` | Total time a job may spend deferring, measured from its first defer, before it is given up on as `inactive`. |
 | `error_time` | int (s) | none | Counterpart to `defer_time` for the failure path. |
 
+**A running job is expected to say something.** Every line on stdout/stderr and every `bibi.job` signal counts as activity; the wrapper records the moment in `jobs.last_ping_at`, and since v0.7.6 that value travels to the client alongside `silence_timeout`, so the FE can show when the deadline runs out. A job that says nothing for `silence_timeout` is killed as a `zombie` — that is the promise, not an accident.
+
+> **Buffer your output at your peril.** The wrapper only sees a line once it reaches its pipe. An app that buffers stdout in blocks can work and log for minutes without a single line arriving, and from the deadline's point of view it is **silent** the whole time. Use `print(..., flush=True)` or `PYTHONUNBUFFERED=1`. The trap is nasty because it only shows up under load: short runs flush their buffer when they exit. If your job genuinely has nothing to print — an app idling between requests — call `bibi.job.activity()`, which is a heartbeat without a line. If it cannot talk over stdout at all, `POST /-/job/{id}/ping` feeds the same column.
+
 The `attempts` semantics are the field most likely to surprise you, and they were surprising in production: the wrapper checks `attempt_cur < attempts_max`, so `attempts: 1` runs the job **twice** before reporting `error`. The default was changed from `1` to `0` in July 2026 after exactly that happened to a job that never asked for a retry.
 
 ### Execution environment
