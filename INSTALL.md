@@ -73,13 +73,9 @@ python -c "import bibi.config as c; print(c.env_path())"
 test -f data/env && grep -oE '^[A-Za-z_][A-Za-z0-9_]*=' data/env | tr -d '='
 ```
 
-Das zeigt die Variablennamen **ohne die Werte** — genug, um zu sehen, ob dort schon jemand wohnt, und unbedenklich in einem Terminal, dem jemand zusieht. Gehört der Eintrag zu einem anderen Checkout, gib dieser Instanz ihre eigene Datei und benutze sie für **jeden** `bibi-ctrl`-Aufruf:
+Das zeigt die Variablennamen **ohne die Werte** — genug, um zu sehen, ob dort schon jemand wohnt, und unbedenklich in einem Terminal, dem jemand zusieht. Gehört der Eintrag zu einem anderen Checkout, ist das seit `v0.7.3` von selbst erledigt: jede Instanz liest `<repo>/data/env`, und zwei Checkouts sind zwei Dateien, die einander nicht sehen können.
 
-```bash
-export BIBI_CONFIG_PATH="$PWD/data/bibi-env"
-```
-
-`config.py` löst sie vor `XDG_CONFIG_HOME` auf. Der sarasate-Host und sein Client fahren seit dem 2026-07-11 genau so — die Fähigkeit ist erprobt, nur ihre Erwähnung fehlte hier. Zwei Anschlüsse, ohne die es nicht hält: **die Variable gehört auch in die systemd-/launchd-Unit** (Schritt 6), sonst liest der Daemon beim nächsten Start wieder die geteilte Datei; und **`BIBI_WORKER_NAME` gehört dazu**, sonst meldet sich die zweite Instanz unter `socket.gethostname()` an und kollidiert mit der ersten in der Team-Registry.
+Hier stand bis zum 2026-08-09 die Anweisung, `BIBI_CONFIG_PATH` zu exportieren und in die Unit nachzutragen ([`#64`](https://github.com/plan-net-journey/bibi/issues/64)). Die Variable gibt es seit [`#52`](https://github.com/plan-net-journey/bibi/issues/52) nicht mehr — `config.py` liest sie nicht, und die Präzedenzkette gegen `XDG_CONFIG_HOME`, die hier behauptet wurde, ist mit ihr entfallen. Ebenso `BIBI_WORKER_NAME`: der Schlüssel heißt seit PLAN-34 `BIBI_NODE_NAME`, und `bibi-ctrl doctor` meldet den alten als `legacy-node-name`.
 
 ```bash
 bibi-ctrl init
@@ -152,7 +148,7 @@ als Befehle (Skills sind in `.claude/skills/` committed).
 bibi-ctrl daemon install [--connect]
 ```
 
-`--connect` auf einem Worker, nie auf einem Scheduler. Läuft eine **zweite Instanz** auf derselben Maschine (Schritt 3), trag `BIBI_CONFIG_PATH` und `BIBI_WORKER_NAME` von Hand in die geschriebene Unit nach — `daemon install` nimmt sie nicht mit, und ohne sie liest der Daemon beim nächsten Start wieder die geteilte Konfiguration.
+`--connect` auf einem Worker, nie auf einem Scheduler. Eine **zweite Instanz** auf derselben Maschine (Schritt 3) braucht in der Unit nichts Zusätzliches mehr: seit `v0.7.3` findet jede Instanz ihre Konfiguration über ihr `WorkingDirectory`. Einen sprechenden Namen in der Team-Registry gibt `BIBI_NODE_NAME` — nützlich, aber keine Bedingung, denn geschlüsselt wird ohnehin auf die `node_id`.
 
 Steht auf einem **Client** schon eine Unit, weil sie aus einer früheren Anleitung stammt: `bibi-ctrl daemon uninstall`.
 
@@ -393,9 +389,9 @@ Zwei Regeln:
 2. Frag mich bei jedem Schritt: "Hätte ein Fremder das gewusst?" Ich neige
    dazu, Lücken zu überlesen, weil ich das System kenne.
 
-Läuft auf dieser Maschine schon eine bibi-Instanz? Dann halte mich auf,
-bevor ich `bibi-ctrl init` ohne BIBI_CONFIG_PATH ausführe — es überschreibt
-sonst deren Konfiguration ohne Backup.
+Läuft auf dieser Maschine schon eine bibi-Instanz? Seit `v0.7.3` ist das
+kein Grund zur Sorge mehr — `init` schreibt `<repo>/data/env`, also die
+Datei dieses Checkouts, und legt vor dem Überschreiben ein Backup an.
 
 Am Ende: sortiere die Befunde danach, wem sie gehören — dem Blueprint, der
 Engine oder dieser Instanz. Im Zweifel Blueprint: ein Fehler dort trifft
