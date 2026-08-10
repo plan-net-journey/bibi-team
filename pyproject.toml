@@ -1,6 +1,6 @@
 [project]
 name = "bibi-team"
-version = "0.7.20"
+version = "0.7.21"
 description = "Team-Repo der bibi-Engine — deklariert bibi als Abhängigkeit"
 requires-python = ">=3.11"
 dependencies = [
@@ -14,7 +14,7 @@ dependencies = [
     # (INSTALL.md-Falle: ohne Extra crash-loopt der Daemon mit
     # "ModuleNotFoundError: No module named 'uvicorn'" bei jedem Neustart,
     # da uv run/uv sync das venv gegen genau diese Deklaration zurücksynct).
-    "bibi[daemon] @ git+https://github.com/plan-net-journey/bibi.git@v0.7.20",
+    "bibi[daemon] @ git+https://github.com/plan-net-journey/bibi.git@v0.7.21",
 ]
 
 # Ein Team-Repo ist ein reines Vault-/Config-Repo, kein eigenes Python-Paket —
