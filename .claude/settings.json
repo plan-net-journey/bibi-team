@@ -14,6 +14,21 @@
           {
             "type": "command",
             "command": "bibi-ctrl sync hook-start"
+          },
+          {
+            "type": "command",
+            "command": "bibi-ctrl soul --hook"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bibi-ctrl soul --hook"
           }
         ]
       }
