@@ -113,7 +113,7 @@ job: node fetch.mjs          # shell command to run …
 # job: "claude: summarize today"   # … OR an AI prompt, via the claude: prefix
 app_port: 9100               # optional: long-running app / HITL port
 exec_mode: container         # host | container
-attempts: 3                  # optional: N *additional* retries after the first run (default 0 = one run, no retry)
+attempts: 3                  # optional: total attempts including the first run (default 1 = one run, no retry; 0 = never starts)
 backoff: exponential         # optional retry strategy
 docker_args: ["-p", "8780:8780"]   # optional, exec_mode: container only — see WARNING below
 ---

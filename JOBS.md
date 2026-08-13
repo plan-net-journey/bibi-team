@@ -152,7 +152,7 @@ Every key the parser reads. Anything not listed here is ignored, so you can keep
 
 | Key | Type | Default | Meaning |
 |---|---|---|---|
-| `attempts` | int | `0` | Retries **in addition to** the first run. `0` means one run and no retry; `2` means up to three runs total. |
+| `attempts` | int | `1` | **Total** attempts, the first run included. `1` means one run and no retry; `3` means up to three runs. `0` means the job never starts — not even manually. Changed in `v0.8.10` (plan-net-journey/bibi#168): the old reading counted retries *in addition to* the first run, so `attempts: 3` produced four runs. |
 | `backoff` | string | `fixed` | `fixed` \| `linear` \| `exponential`. |
 | `silence_timeout` | int (s) | context-dependent | No stdout/stderr for this long while `running` → `zombie`. Default is `3600` for Claude payloads, `172800` (48h) when `app_port`/`app_prefix` is set, `7200` otherwise. |
 | `wall_time` | int (s) | none | Hard kill after this long. Opt-in only — there is deliberately no global default, because it would kill every app. |
