@@ -19,6 +19,8 @@ Never write a bare `<placeholder>`-style angle-bracket tag in flowing text — o
 
 `bibi-ctrl doctor` checks both rules across the entire vault (`markdown-hardwrap`, `html-placeholder-tag`) and exits non-zero on findings, which makes it usable as a pre-commit/CI gate. Treat it as a net, not as a substitute for getting it right while writing.
 
+**New documents link with standard Markdown syntax** — `[label](path/to/file.md)` — rather than Obsidian wikilinks. The reason is mechanical, not stylistic: a wikilink that carries a display label contains a `|`, and inside a table row that `|` ends the cell. This has already broken a table in practice. Standard Markdown links contain no `|`, which makes the failure impossible by construction. Existing documents are **not** migrated — the convention applies to new text only, and rewriting settled documents would produce diffs without benefit. `doctor` does not check this rule.
+
 ### `==name:==` annotations and the signature file
 
 Discussion inside a vault document happens **inline**, not in a separate thread: an annotator prefixes their remark with a highlighted `==name:==` marker (Obsidian's `==highlight==` syntax) and writes it exactly where it belongs. Several people — and the AI — answer each other in the same run of text, which is the practical reason a paragraph must stay one physical line: a hard-wrapped paragraph turns every inserted remark into a re-flow of the whole block, and the diff stops showing who said what.
